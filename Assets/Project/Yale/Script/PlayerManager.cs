@@ -57,6 +57,9 @@ public class PlayerManager : MonoBehaviour
         // (*** โค้ดใหม่: คำนวณจุดยิง SphereCast ***)
         // (ยิงจาก "จุดกึ่งกลาง" ของ Controller ลงไป)
         groundCheckOffset = new Vector3(0, controller.center.y, 0); 
+        
+        // (*** โค้ดที่เติม (แก้บั๊กวิ่งค้าง) ***)
+        animator.applyRootMotion = false; // <--- 1. ปิด Root Motion เป็นค่าเริ่มต้น
     }
     
     // (*** ฟังก์ชันใหม่: ตัวเช็คพื้น V.2 ***)

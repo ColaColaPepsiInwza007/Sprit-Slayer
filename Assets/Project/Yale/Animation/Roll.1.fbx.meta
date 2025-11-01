@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 420e4a6c44c6a6647aa681f2c2e5e765
+guid: 2267be726c03f104baa7d0de86381060
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -47,7 +47,7 @@ ModelImporter:
       loopBlendOrientation: 0
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
+      keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
       heightFromFeet: 0
@@ -205,22 +205,22 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: metarig|RunFowardAction
-      takeName: metarig|RunFowardAction
-      internalID: -845757513067260850
+      name: metarig|RollAction
+      takeName: metarig|RollAction
+      internalID: -7718028490414592623
       firstFrame: 0
-      lastFrame: 17
+      lastFrame: 35
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 1
+      loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
-      loopBlendPositionXZ: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0

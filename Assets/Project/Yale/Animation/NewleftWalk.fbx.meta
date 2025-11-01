@@ -505,34 +505,34 @@ ModelImporter:
         length: 0
         modified: 0
     skeleton:
-    - name: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+    - name: Eren_T_POSEfbx(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Cube.001
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: -0.7575941, y: 0.23507012, z: 0.7151315}
       rotation: {x: 4.3923805e-22, y: 0.70710665, z: -4.392379e-22, w: 0.7071069}
       scale: {x: 0.830644, y: 1.1834337, z: 0.47359806}
     - name: Cube.002
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.70276237, y: 0.23507012, z: 0.715132}
       rotation: {x: 4.3923805e-22, y: 0.70710665, z: -4.392379e-22, w: 0.7071069}
       scale: {x: 0.830644, y: 1.1834337, z: 0.47359806}
     - name: Cube.003
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.13809815, y: -1.7988789, z: -0.044714183}
       rotation: {x: -0, y: -0.70710665, z: 0, w: 0.70710695}
       scale: {x: 1.1861634, y: 1.1861634, z: 1.1861634}
     - name: metarig
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: -0, y: 0.20166826, z: 0.019786358}
       rotation: {x: -0.7071068, y: -0.000000015454312, z: -0.000000015454312, w: 0.7071068}
       scale: {x: 526.577, y: 526.577, z: 526.577}
     - name: Hips
       parentName: metarig
-      position: {x: -0.0001278975, y: 0.0003, z: 0.012}
+      position: {x: -0.0001278975, y: 0.0002922924, z: 0.012353028}
       rotation: {x: 0.75664335, y: 0.07076196, z: -0.06439245, w: -0.6467899}
       scale: {x: 0.9999999, y: 1.000007, z: 1.0000067}
     - name: spine
@@ -598,13 +598,8 @@ ModelImporter:
     - name: hand.R
       parentName: forearm.R
       position: {x: 5.122274e-11, y: 0.0032944104, z: 9.313225e-11}
-      rotation: {x: 0.069532365, y: 0.027630573, z: -0.62941253, w: 0.7734609}
+      rotation: {x: 0.08571904, y: 0.10298913, z: -0.02398546, w: 0.9906918}
       scale: {x: 1.0000005, y: 1.0000019, z: 1.0000058}
-    - name: material.003
-      parentName: hand.R
-      position: {x: -0.0025469866, y: 0.00029404787, z: -0.000060366987}
-      rotation: {x: -0.094216585, y: 0.9910941, z: -0.09176542, w: 0.020853313}
-      scale: {x: 0.0000023194766, y: 0.0000011090565, z: 0.0000013992857}
     - name: Sphere.016
       parentName: spine
       position: {x: -0.000012383522, y: 0.0013588348, z: 0.0005262106}
@@ -622,7 +617,7 @@ ModelImporter:
       scale: {x: 0.0019216707, y: 0.0019216709, z: 0.001921671}
     - name: thigh.L
       parentName: Hips
-      position: {x: -0.00178, y: 0.0024, z: 0.00019}
+      position: {x: -0.0017818373, y: 0.0025526737, z: 0.00021419552}
       rotation: {x: 0.17820843, y: 0.09436705, z: -0.01654906, w: 0.9793175}
       scale: {x: 0.99999976, y: 0.99999744, z: 0.9999986}
     - name: shin.L
@@ -637,7 +632,7 @@ ModelImporter:
       scale: {x: 0.9999993, y: 0.9999991, z: 1.0000035}
     - name: toe.L
       parentName: foot.L
-      position: {x: -8.8475643e-11, y: 0.0024555118, z: -7.4505804e-11}
+      position: {x: -0, y: 0.00246, z: 0}
       rotation: {x: 0.014807309, y: 0.99157697, z: -0.08627239, w: 0.09546202}
       scale: {x: 1.0000101, y: 0.99999905, z: 0.9999992}
     - name: Sphere.007
@@ -647,7 +642,7 @@ ModelImporter:
       scale: {x: 0.001899057, y: 0.0018990573, z: 0.0018990568}
     - name: thigh.R
       parentName: Hips
-      position: {x: 0.00185, y: 0.00247, z: -0.00059}
+      position: {x: 0.0018488703, y: 0.0026950764, z: -0.0005590094}
       rotation: {x: 0.18031958, y: 0.09667112, z: 0.00586244, w: 0.97882855}
       scale: {x: 0.9999999, y: 1.0000035, z: 1.0000045}
     - name: shin.R
@@ -671,52 +666,52 @@ ModelImporter:
       rotation: {x: -0.7060163, y: 0.036332782, z: 0.7070019, w: -0.019215269}
       scale: {x: 0.0018990503, y: 0.0018990567, z: 0.0018990566}
     - name: Sphere.001
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.9199942, y: 4.7903166, z: 0.58422536}
       rotation: {x: 0.92091477, y: 0.04938322, z: 0.3866199, w: -0.0015411762}
       scale: {x: 0.30145317, y: 1.0993733, z: 0.51400906}
     - name: Sphere.002
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.000000012632858, y: 7.9222946, z: -0.018983614}
       rotation: {x: -0, y: -0.70710665, z: 0, w: 0.70710695}
       scale: {x: 1.6471598, y: 1.8248326, z: 2.3827531}
     - name: Sphere.003
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.8070703, y: 2.5163624, z: 0.39203772}
       rotation: {x: 0.92091477, y: 0.049383227, z: 0.38661993, w: -0.0015411831}
       scale: {x: 0.23314296, y: 0.85025185, z: 0.39753303}
     - name: Sphere.004
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: -0.60579526, y: 4.790313, z: 0.59765136}
       rotation: {x: 0.92091477, y: 0.04938322, z: 0.3866199, w: -0.0015411762}
       scale: {x: 0.30145317, y: 1.0993733, z: 0.51400906}
     - name: Sphere.006
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.05544021, y: 5.9476585, z: -0.01898361}
       rotation: {x: -0.037115175, y: -0.70743334, z: 0.03353177, w: 0.705008}
       scale: {x: 1.634095, y: 1.8103595, z: 2.363854}
     - name: Sphere.008
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: -5.7477922, y: 8.0802355, z: -0.41398895}
       rotation: {x: -0, y: -0.70710665, z: 0, w: 0.70710695}
       scale: {x: 0.45802578, y: 0.45802578, z: 0.45802578}
     - name: Sphere.019
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 6.107653, y: 8.146721, z: -0.43357676}
       rotation: {x: -0, y: -0.70710665, z: 0, w: 0.70710695}
       scale: {x: 0.45802578, y: 0.45802578, z: 0.45802578}
     - name: Sphere.022
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: -0.60265934, y: 2.5163624, z: 0.39203724}
       rotation: {x: 0.92091477, y: 0.049383227, z: 0.38661993, w: -0.0015411831}
       scale: {x: 0.23314296, y: 0.85025185, z: 0.39753303}
     - name: "\u0E04\u0E2D.001"
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.058398683, y: 9.714439, z: -0.018815242}
       rotation: {x: 0, y: 0.70710665, z: 0, w: 0.7071069}
       scale: {x: 0.4528222, y: 0.7035318, z: 0.4528222}
     - name: "\u0E2B\u0E21\u0E27\u0E01"
-      parentName: "\u0E15\u0E31\u0E27_T_POSE`_\u0E15\u0E31\u0E27\u0E08\u0E23\u0E34\u0E07_2(Clone)"
+      parentName: Eren_T_POSEfbx(Clone)
       position: {x: 0.038881764, y: 10.1516, z: 0.02037053}
       rotation: {x: -0, y: -0.70710665, z: 0, w: 0.70710695}
       scale: {x: 1.2630842, y: 1.2630842, z: 1.2630842}
@@ -732,7 +727,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 98682a2b5bd4e9c418c66b3dbab98079, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 308eac8b19af0524ab910bc43c08c839, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1

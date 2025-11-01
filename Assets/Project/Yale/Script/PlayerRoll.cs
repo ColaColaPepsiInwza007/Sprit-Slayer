@@ -32,32 +32,25 @@ public class PlayerRoll : MonoBehaviour
         float moveAmount = moveInput.magnitude;
         Vector3 rollDirection; // (สร้างตัวแปร)
 
-        // (*** โค้ด Logic ใหม่ (Omnidirectional Dodge) ***)
-        // ----------------------------------------------------
-
+        // (*** โค้ด Logic V.5 (Omnidirectional Dodge) ***)
         // 1. ถ้า "กด" ทิศทาง (W,A,S,D)
         if (moveAmount > 0.1f)
         {
             // === กลิ้งตามทิศ (Camera-Relative) ===
-            // (ใช้ Logic นี้ "เสมอ" ไม่ว่าจะล็อคเป้าหรือไม่)
             rollDirection = (manager.cameraMainTransform.forward * moveInput.y) + (manager.cameraMainTransform.right * moveInput.x);
         }
         else
         {
             // === กลิ้งแบบไม่กดทิศ (Neutral Dodge) ===
-            // (ค่อยมาเช็คสถานะตัวละคร)
             if (manager.lockedTarget != null)
             {
-                // ถ้าล็อคเป้าอยู่: ให้ "ถอยหลัง" (Backstep)
-                rollDirection = -transform.forward; 
+                rollDirection = -transform.forward; // (Backstep)
             }
             else
             {
-                // ถ้าไม่ได้ล็อค: ให้ "พุ่งไปข้างหน้า" (Forward Dodge)
-                rollDirection = transform.forward;
+                rollDirection = transform.forward; // (Forward Dodge)
             }
         }
-        // ----------------------------------------------------
             
         rollDirection.y = 0; 
 
@@ -67,12 +60,14 @@ public class PlayerRoll : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(rollDirection.normalized);
         }
         
-        // (โค้ดที่เหลือ... เหมือนเดิม)
+        // (โค้ด Stamina... เหมือนเดิม)
         isRolling = true; 
         manager.stats.currentStamina -= rollCost; 
         manager.stats.UpdateStaminaBar();
 
-        // (สั่งให้กล้องหน่วง... (อันนี้ไม่ทำงานในโหมด "กล้อง FreeLook" แต่ใส่ไว้ก็ไม่เสียหาย))
+        // (*** โค้ดแก้บั๊ก Root Motion ***)
+        manager.animator.applyRootMotion = true; // <--- "เปิด" Root Motion (สำหรับกลิ้ง)
+
         manager.lockOn.SetRollDamping(true);
         
         manager.animHandler.TriggerRoll(); 
@@ -92,10 +87,17 @@ public class PlayerRoll : MonoBehaviour
     public void StartIFrames() { manager.stats.isInvincible = true; }
     public void EndIFrames() { manager.stats.isInvincible = false; }
     
-    // (FinishRoll... เหมือนเดิม)
+    // (*** โค้ด "พิสูจน์บั๊ก" ***)
     public void FinishRoll() 
     { 
+        // (*** โค้ดพิสูจน์ ***)
+        Debug.Log("!!! FINISH ROLL (ปุ่มถูกกดแล้ว) !!!"); // <--- เพิ่มบรรทัดนี้
+
         isRolling = false; 
+        
+        // (*** โค้ดแก้บั๊ก Root Motion ***)
+        manager.animator.applyRootMotion = false; // "ปิด" Root Motion
+
         manager.lockOn.SetRollDamping(false);
     }
 }
