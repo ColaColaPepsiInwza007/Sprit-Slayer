@@ -5,7 +5,6 @@ public class PlayerMovement : MonoBehaviour
     private PlayerManager manager; 
     private Vector3 playerVelocity;
     
-    // (*** โค้ดใหม่ 1/4: ตัวแปร "จำ" โมเมนตัม ***)
     private Vector3 airMomentum; // (ตัวเก็บโมเมนตัมแนวนอน)
 
     [Header("Movement Settings")]
@@ -18,9 +17,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpHeight = 1.8f; 
     [SerializeField] private float groundCheckStickForce = -2f; 
     
-    // (*** โค้ดใหม่ 2/4: เราลบ "airControlMultiplier" ทิ้งไปเลย ***)
-    // [SerializeField] private float airControlMultiplier = 0.5f; // (ลบทิ้ง!)
-
     [Header("Stamina Settings")]
     [SerializeField] private float staminaDepleteRate = 15f; 
     [SerializeField] private float staminaRegenRate = 20f;   
@@ -30,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         manager = GetComponent<PlayerManager>();
-        airMomentum = Vector3.zero; // (*** โค้ดใหม่ 3/4: รีเซ็ตค่าเริ่มต้น ***)
+        airMomentum = Vector3.zero; 
     }
 
     public void HandleGravity()
@@ -46,7 +42,6 @@ public class PlayerMovement : MonoBehaviour
     
     public void HandleJump()
     {
-        // (ฟังก์ชันนี้เหมือนเดิมเป๊ะ! ... `airMomentum` จะถูกเซ็ตจาก HandleMovement)
         playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
         manager.animHandler.TriggerJump();
     }
@@ -77,14 +72,12 @@ public class PlayerMovement : MonoBehaviour
         manager.stats.UpdateStaminaBar();
     }
     
-    // (*** โค้ดอัปเกรด (V.10 - Committed Jumps) ***)
+    // (*** โค้ดอัปเกรด (V.11 - Air Rotation) ***)
     public void HandleMovement(float delta, Vector2 moveInput, bool isSprinting, Transform lockedTarget, Transform cameraMainTransform, bool isLockOnSprinting)
     {
         float moveAmount = moveInput.magnitude;
         Vector3 moveDirection = (cameraMainTransform.forward * moveInput.y) + (cameraMainTransform.right * moveInput.x);
         moveDirection.y = 0;
-        
-        // (*** โค้ดใหม่ 4/4: แก้ไข Logic ทั้งหมดในนี้ ***)
         
         if (manager.isGrounded)
         {
@@ -98,38 +91,51 @@ public class PlayerMovement : MonoBehaviour
                     currentSpeed = sprintSpeed;
                 }
                 
-                // (อัปเดต "โมเมนตัม" ตลอดเวลาที่เดินบนพื้น)
-                // (นี่คือค่าที่เราจะ "จำ" ไว้ใช้ตอนกระโดด)
+                // (อัปเดต "โมเมนตัม")
                 airMomentum = moveDirection.normalized * currentSpeed;
                 
-                // (ใช้โมเมนตัมนี้เคลื่อนที่)
+                // (เคลื่อนที่)
                 manager.controller.Move(airMomentum * delta);
                 
-                // (Logic การหมุนตัว... เหมือนเดิม)
+                // (Logic การหมุนตัว... บนพื้น)
                 if (lockedTarget != null && !isLockOnSprinting)
                 {
-                    // (LockOn)
+                    // (ไม่ต้องทำอะไร... PlayerLockOn.cs จัดการให้)
                 }
                 else
                 {
-                    // (FreeLook / LockOn Sprint)
+                    // (FreeLook / LockOn Sprint บนพื้น)
                     manager.movement.HandleFreeLookRotation(moveDirection.normalized, delta);
                 }
             }
             else
             {
-                // (ถ้าหยุดเดินบนพื้น... ก็ต้องรีเซ็ตโมเมนตัม)
-                // (กันบั๊ก "ยืนโดด" แล้วตัวพุ่ง)
+                // (รีเซ็ตโมเมนตัม (กันโดดยืนแล้วพุ่ง))
                 airMomentum = Vector3.zero;
             }
         }
         else
         {
-            // === 2. อยู่กลางอากาศ (Committed Jump) ===
-            // (เราไม่ "อ่าน Input" ใหม่)
-            // (เราใช้ `airMomentum` ที่ "จำ" ไว้จากตอนที่อยู่บนพื้น)
-            // (HandleGravity() จะจัดการเรื่องดิ่งลงเอง)
+            // === 2. อยู่กลางอากาศ (Committed Jump + Air Rotation) ===
+            
+            // (1. Movement: ใช้โมเมนตัมที่ "จำ" ไว้)
             manager.controller.Move(airMomentum * delta);
+            
+            // (*** โค้ดใหม่: เพิ่ม Logic การหมุนตัวกลางอากาศ ***)
+            if (moveAmount > 0.1f) // (เช็คว่ากดปุ่ม W,A,S,D)
+            {
+                if (lockedTarget != null && !isLockOnSprinting)
+                {
+                    // (ไม่ต้องทำอะไร... PlayerLockOn.cs จัดการให้)
+                    // (เพราะ PlayerManager เรียก HandleLockOn() กลางอากาศอยู่แล้ว)
+                }
+                else
+                {
+                    // (FreeLook / LockOn Sprint... กลางอากาศ)
+                    // (นี่คือสิ่งที่นายขอนั่นเอง!)
+                    manager.movement.HandleFreeLookRotation(moveDirection.normalized, delta);
+                }
+            }
         }
     }
 
