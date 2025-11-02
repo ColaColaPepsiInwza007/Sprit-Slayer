@@ -1,6 +1,13 @@
 using UnityEngine;
 
-// (RequireComponent... เหมือนเดิม)
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(PlayerStats))]
+[RequireComponent(typeof(PlayerInputHandler))]
+[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerAnimator))]
+[RequireComponent(typeof(PlayerLockOn))]
+[RequireComponent(typeof(PlayerRoll))]
 public class PlayerManager : MonoBehaviour
 {
     [Header("Action States")]
@@ -27,15 +34,12 @@ public class PlayerManager : MonoBehaviour
     public bool isGrounded;
     public Transform lockedTarget; 
 
-    // (*** โค้ดใหม่ 1/6 ***)
     [Header("Mouse Lock Settings")]
-    public bool isMouseLocked = true; // <--- สถานะเมาส์
+    public bool isMouseLocked = true; 
 
     [Header("Camera")]
     public Transform cameraMainTransform;
 
-    // (Header... Ground Check, Stamina ... เหมือนเดิม)
-    // ...
     [Header("Ground Check Settings")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float groundCheckRadius = 0.3f;
@@ -49,9 +53,13 @@ public class PlayerManager : MonoBehaviour
 
     private float rollBufferTimer; 
 
+    [Header("Tap vs Hold Input")]
+    [SerializeField] private float tapRollThreshold = 0.2f; // (เวลาก่อนจะนับเป็น "Hold" ... 0.2 วิ)
+    private float sprintInputTimer = 0f; // (ตัวนับเวลา)
+    private bool isSprintButtonHeld = false; // (เช็คว่าปุ่มค้างอยู่มั้ย)
+
     private void Awake()
     {
-        // (โค้ด Awake... เหมือนเดิม)
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStats>();
@@ -61,11 +69,7 @@ public class PlayerManager : MonoBehaviour
         lockOn = GetComponent<PlayerLockOn>();
         rollHandler = GetComponent<PlayerRoll>();
 
-        if (Camera.main != null)
-        {
-            cameraMainTransform = Camera.main.transform;
-        }
-
+        if (Camera.main != null) { cameraMainTransform = Camera.main.transform; }
         groundCheckOffset = new Vector3(0, controller.center.y, 0); 
         animator.applyRootMotion = false; 
         
@@ -73,44 +77,12 @@ public class PlayerManager : MonoBehaviour
         swordInScabbard.SetActive(true);
         isWeaponDrawn = false;
         
-        // (*** โค้ดใหม่ 2/6 ***)
-        LockMouse(); // <--- สั่งล็อคเมาส์ทันทีที่เกมเริ่ม
+        LockMouse(); 
     }
     
-    // (*** โค้ดใหม่ 3/6: ฟังก์ชันสลับเมาส์ ***)
-    public void ToggleMouseLock()
-    {
-        isMouseLocked = !isMouseLocked; // (สลับค่า true/false)
-        if (isMouseLocked)
-        {
-            LockMouse();
-        }
-        else
-        {
-            UnlockMouse();
-        }
-    }
-
-    // (*** โค้ดใหม่ 4/6: ฟังก์ชันล็อคเมาส์ ***)
-    private void LockMouse()
-    {
-        Cursor.lockState = CursorLockMode.Locked; // <--- ล็อคเมาส์ให้อยู่กลางจอ
-        Cursor.visible = false;                   // <--- ซ่อนเมาส์
-        isMouseLocked = true;
-    }
-
-    // (*** โค้ดใหม่ 5/6: ฟังก์ชันปลดล็อคเมาส์ ***)
-    private void UnlockMouse()
-    {
-        Cursor.lockState = CursorLockMode.None;   // <--- ปล่อยเมาส์เป็นอิสระ
-        Cursor.visible = true;                    // <--- โชว์เมาส์
-        isMouseLocked = false;
-    }
-
-    // (HandleGroundCheck... เหมือนเดิม)
+    // (*** โค้ดใหม่: เอากลับมาแล้ว! ***)
     private void HandleGroundCheck()
     {
-        //...
         Vector3 spherePosition = transform.position + groundCheckOffset;
         if (Physics.SphereCast(spherePosition, groundCheckRadius, Vector3.down, 
                                out RaycastHit hit, groundCheckDistance, groundLayer))
@@ -122,40 +94,90 @@ public class PlayerManager : MonoBehaviour
             isGrounded = false; 
         }
     }
+    
+    // (*** โค้ดใหม่: เอากลับมาแล้ว! ***)
+    public void ToggleMouseLock()
+    {
+        isMouseLocked = !isMouseLocked; 
+        if (isMouseLocked) { LockMouse(); }
+        else { UnlockMouse(); }
+    }
 
+    // (*** โค้ดใหม่: เอากลับมาแล้ว! ***)
+    private void LockMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked; 
+        Cursor.visible = false;                   
+        isMouseLocked = true;
+    }
+
+    // (*** โค้ดใหม่: เอากลับมาแล้ว! ***)
+    private void UnlockMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;   
+        Cursor.visible = true;                    
+        isMouseLocked = false;
+    }
+    
+    // (*** โค้ดใหม่: เอากลับมาแล้ว! ***)
+    public void ToggleWeapon()
+    {
+        if (isRolling || isLanding || !isGrounded) return; 
+        isWeaponDrawn = !isWeaponDrawn; 
+        weaponInHand.SetActive(isWeaponDrawn);        
+        swordInScabbard.SetActive(!isWeaponDrawn);    
+        // animHandler.SetArmed(isWeaponDrawn); 
+    }
+
+    // (*** นี่คือ Update() ฉบับสมบูรณ์ ***)
     private void Update()
     {
         float delta = Time.deltaTime;
 
-        HandleGroundCheck(); 
+        HandleGroundCheck(); // <--- (*** บรรทัดนี้จะหาย Error แล้ว ***)
         animHandler.SetGrounded(isGrounded); 
 
-        if (jumpCooldownTimer > 0)
+        if (jumpCooldownTimer > 0) { jumpCooldownTimer -= delta; }
+
+        // (Logic เช็ค Input)
+        if (inputHandler.toggleMouseInput) { ToggleMouseLock(); }
+        if (inputHandler.drawWeaponInput) { ToggleWeapon(); }
+
+        // (Logic Tap vs Hold)
+        bool isTryingToSprint = false; 
+        if (rollBufferTimer > 0) { rollBufferTimer -= delta; } 
+
+        bool sprintHeld = inputHandler.sprintInput; 
+        bool sprintReleased = inputHandler.sprintInputReleased; 
+
+        if (sprintHeld)
         {
-            jumpCooldownTimer -= delta;
+            if (!isSprintButtonHeld) 
+            {
+                isSprintButtonHeld = true; 
+                sprintInputTimer = 0f; 
+            }
+            sprintInputTimer += delta; 
+            if (sprintInputTimer > tapRollThreshold)
+            {
+                isTryingToSprint = true; 
+            }
+        }
+        if (sprintReleased)
+        {
+            if (isSprintButtonHeld && sprintInputTimer < tapRollThreshold)
+            {
+                rollBufferTimer = rollHandler.rollBufferTime; 
+            }
+            isSprintButtonHeld = false;
+            sprintInputTimer = 0f;
         }
         
-        // (*** โค้ดใหม่ 6/6: เพิ่มการเช็คปุ่มสลับเมาส์ ***)
-        if (inputHandler.toggleMouseInput)
-        {
-            ToggleMouseLock();
-        }
-
-        if (inputHandler.drawWeaponInput)
-        {
-            ToggleWeapon();
-        }
-
-        // (โค้ดที่เหลือเหมือนเดิมเป๊ะ)
-        // ... (Sprint, Roll, Jump, Stamina) ...
-        // ...
-        
-        bool isTryingToSprint = inputHandler.isSprinting; 
+        // (โค้ดที่เหลือ... เหมือนเดิม)
         isRolling = rollHandler.isRolling; 
         
         if (inputHandler.jumpInput && isGrounded && !isRolling && !isLanding && jumpCooldownTimer <= 0) 
         {
-            // (โค้ด Jump)
             if (stats.currentStamina >= jumpStaminaCost) 
             {
                 stats.currentStamina -= jumpStaminaCost; 
@@ -164,9 +186,6 @@ public class PlayerManager : MonoBehaviour
                 jumpCooldownTimer = jumpCooldown; 
             }
         }
-
-        if (inputHandler.rollInput) { rollBufferTimer = rollHandler.rollBufferTime; }
-        else { if (rollBufferTimer > 0) { rollBufferTimer -= delta; } }
         
         movement.HandleStamina(delta, isTryingToSprint, isRolling, inputHandler.moveInput.magnitude);
         isSprinting = isTryingToSprint && stats.currentStamina > 0; 
@@ -195,15 +214,5 @@ public class PlayerManager : MonoBehaviour
     private void FixedUpdate()
     {
         movement.HandleGravity();
-    }
-    
-    // (ฟังก์ชัน ToggleWeapon... เหมือนเดิม)
-    public void ToggleWeapon()
-    {
-        if (isRolling || isLanding || !isGrounded) return; 
-        isWeaponDrawn = !isWeaponDrawn; 
-        weaponInHand.SetActive(isWeaponDrawn);        
-        swordInScabbard.SetActive(!isWeaponDrawn);    
-        // animHandler.SetArmed(isWeaponDrawn); 
     }
 }

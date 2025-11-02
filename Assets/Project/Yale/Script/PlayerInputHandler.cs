@@ -5,13 +5,19 @@ public class PlayerInputHandler : MonoBehaviour
 {
     public PlayerControls playerControls;
     public Vector2 moveInput { get; private set; }
-    public bool isSprinting { get; private set; }
-    public bool rollInput { get; private set; } 
+    
+    // (*** โค้ดใหม่ 1/3: เปลี่ยนชื่อ isSprinting -> sprintInput ***)
+    public bool sprintInput { get; private set; } // (นี่คือ IsPressed())
+    
+    // (*** โค้ดใหม่ 2/3: เพิ่มตัวเช็ค "ปล่อย" ***)
+    public bool sprintInputReleased { get; private set; } // (นี่คือ WasReleasedThisFrame())
+    
+    // (*** เราลบ rollInput ทิ้งไปเลย! ***)
+    // public bool rollInput { get; private set; } 
+    
     public bool jumpInput { get; private set; } 
     public bool drawWeaponInput { get; private set; }
-    
-    // (*** โค้ดใหม่ 1/2 ***)
-    public bool toggleMouseInput { get; private set; } // <--- เพิ่มตัวแปรปุ่มสลับเมาส์
+    public bool toggleMouseInput { get; private set; } 
 
     private PlayerManager manager;
 
@@ -33,15 +39,20 @@ public class PlayerInputHandler : MonoBehaviour
         playerControls.Player.LockOn.performed -= _ => manager.lockOn.TryToggleLockOn();
     }
 
+    // (*** โค้ดใหม่ 3/3: อัปเดต Update() ***)
     private void Update()
     {
         moveInput = playerControls.Player.Move.ReadValue<Vector2>();
-        isSprinting = playerControls.Player.Sprint.IsPressed();
-        rollInput = playerControls.Player.Roll.WasPressedThisFrame();
+        
+        // (อ่านค่า Sprint 2 แบบ)
+        sprintInput = playerControls.Player.Sprint.IsPressed();
+        sprintInputReleased = playerControls.Player.Sprint.WasReleasedThisFrame();
+        
+        // (ลบ rollInput ทิ้ง)
+        // rollInput = playerControls.Player.Roll.WasPressedThisFrame();
+        
         jumpInput = playerControls.Player.Jump.WasPressedThisFrame(); 
         drawWeaponInput = playerControls.Player.DrawWeapon.WasPressedThisFrame();
-        
-        // (*** โค้ดใหม่ 2/2 ***)
-        toggleMouseInput = playerControls.Player.ToggleMouse.WasPressedThisFrame(); // <--- อ่านค่าปุ่มสลับเมาส์
+        toggleMouseInput = playerControls.Player.ToggleMouse.WasPressedThisFrame(); 
     }
 }

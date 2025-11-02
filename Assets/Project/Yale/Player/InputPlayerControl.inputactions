@@ -25,15 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Roll",
-                    "type": "Button",
-                    "id": "51614028-6d8d-4f66-be1c-e33188b2ff31",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Sprint",
                     "type": "Button",
                     "id": "b32e1b7a-ef36-4545-b5f9-ca890ca873f9",
@@ -148,20 +139,9 @@
                 },
                 {
                     "name": "",
-                    "id": "6a836956-6df6-421c-ba9c-1ac216dcf954",
-                    "path": "<Keyboard>/ctrl",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Roll",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "c3d3f485-4575-43c8-9740-1b687bdf2813",
                     "path": "<Keyboard>/shift",
-                    "interactions": "",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
                     "action": "Sprint",
