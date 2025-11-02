@@ -2388,7 +2388,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRoll
   rollCost: 15
-  rollDistanceMultiplier: 0.35
+  rollDistanceMultiplier: 0.28
   rollBufferTime: 0.2
 --- !u!114 &1307040032
 MonoBehaviour:
@@ -2438,7 +2438,7 @@ MonoBehaviour:
   sprintSpeed: 6
   rotationSpeed: 15
   gravityValue: -9.81
-  jumpHeight: 1.8
+  jumpHeight: 1.5
   groundCheckStickForce: -2
   airControlMultiplier: 1.05
   staminaDepleteRate: 15
