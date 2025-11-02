@@ -10,6 +10,9 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerRoll))]
 public class PlayerManager : MonoBehaviour
 {
+    [Header("Action States")]
+    public bool isLanding = false; 
+
     [Header("Core Components")]
     public CharacterController controller;
     public Animator animator;
@@ -21,20 +24,24 @@ public class PlayerManager : MonoBehaviour
     public PlayerRoll rollHandler;
 
     [Header("Player State")]
-    public bool isSprinting;
+    public bool isSprinting; // <--- (ค่า "ที่แท้จริง" จะถูกคำนวณใน Update)
     public bool isRolling;
-    public bool isGrounded; // <--- (ตัวแปรนี้... จะถูกควบคุมโดยโค้ดใหม่ของเรา)
+    public bool isGrounded;
     public Transform lockedTarget; 
 
     [Header("Camera")]
     public Transform cameraMainTransform;
 
-    // (*** โค้ดใหม่: สำหรับ Ground Check ***)
     [Header("Ground Check Settings")]
-    [SerializeField] private LayerMask groundLayer; // <--- (ต้องไปตั้งค่าใน Inspector)
+    [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float groundCheckRadius = 0.3f;
     [SerializeField] private float groundCheckDistance = 0.2f;
-    private Vector3 groundCheckOffset; // (จุดที่ยิง SphereCast)
+    private Vector3 groundCheckOffset;
+
+    [Header("Stamina & Cooldowns")]
+    [SerializeField] private float jumpStaminaCost = 10f; 
+    [SerializeField] private float jumpCooldown = 0.5f; 
+    private float jumpCooldownTimer = 0f;
 
     private float rollBufferTimer; 
 
@@ -54,90 +61,99 @@ public class PlayerManager : MonoBehaviour
             cameraMainTransform = Camera.main.transform;
         }
 
-        // (*** โค้ดใหม่: คำนวณจุดยิง SphereCast ***)
-        // (ยิงจาก "จุดกึ่งกลาง" ของ Controller ลงไป)
         groundCheckOffset = new Vector3(0, controller.center.y, 0); 
-        
-        // (*** โค้ดที่เติม (แก้บั๊กวิ่งค้าง) ***)
-        animator.applyRootMotion = false; // <--- 1. ปิด Root Motion เป็นค่าเริ่มต้น
+        animator.applyRootMotion = false; 
     }
     
-    // (*** ฟังก์ชันใหม่: ตัวเช็คพื้น V.2 ***)
     private void HandleGroundCheck()
     {
-        // 1. ตำแหน่งที่จะยิง SphereCast (อัปเดตตามตัวละคร)
         Vector3 spherePosition = transform.position + groundCheckOffset;
-
-        // 2. ยิง SphereCast (ลูกบอลที่มองไม่เห็น) ลงไปที่พื้น
-        // (ยิงจาก 'spherePosition', รัศมี 'groundCheckRadius', ทิศทาง 'Vector3.down', 
-        //  ระยะทาง 'groundCheckDistance', เช็คเฉพาะ Layer 'groundLayer')
         if (Physics.SphereCast(spherePosition, groundCheckRadius, Vector3.down, 
                                out RaycastHit hit, groundCheckDistance, groundLayer))
         {
-            isGrounded = true; // (เจอดิน!)
+            isGrounded = true; 
         }
         else
         {
-            isGrounded = false; // (ลอยอยู่)
+            isGrounded = false; 
         }
     }
 
-
+    // (*** Update() ฉบับอัปเกรด (Final V.9) ***)
     private void Update()
     {
         float delta = Time.deltaTime;
 
-        // (*** โค้ดใหม่: เรียกใช้ตัวเช็คพื้น "ก่อน" ***)
-        HandleGroundCheck(); // <--- (เรียกใช้ "ก่อน" ที่จะทำอย่างอื่น)
+        HandleGroundCheck(); 
+        animHandler.SetGrounded(isGrounded); 
 
-        // อ่าน Input (เหมือนเดิม)
-        isSprinting = inputHandler.isSprinting;
-        isRolling = rollHandler.isRolling; 
-        // isGrounded = controller.isGrounded; // <--- (ลบบรรทัดนี้ทิ้ง! เราไม่ใช้แล้ว!)
-
-        // (โค้ดบัฟเฟอร์... เหมือนเดิม)
-        if (inputHandler.rollInput)
+        if (jumpCooldownTimer > 0)
         {
-            rollBufferTimer = rollHandler.rollBufferTime; 
+            jumpCooldownTimer -= delta;
         }
-        else
+
+        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
+        bool isTryingToSprint = inputHandler.isSprinting; // <--- 1. อ่าน "ความตั้งใจ" (ปุ่ม)
+        isRolling = rollHandler.isRolling; 
+        
+        // (*** โค้ดแก้บั๊ก "กระโดด" ***)
+        // (เรายังไม่เช็ค isGrounded... เพื่อให้โค้ดส่วน "Stamina" ทำงานกลางอากาศได้)
+        
+        // (เช็คอินพุต "กระโดด")
+        if (inputHandler.jumpInput && isGrounded && !isRolling && !isLanding && jumpCooldownTimer <= 0) 
         {
-            if (rollBufferTimer > 0)
+            if (stats.currentStamina >= jumpStaminaCost) 
             {
-                rollBufferTimer -= delta;
+                stats.currentStamina -= jumpStaminaCost; 
+                stats.UpdateStaminaBar();
+                movement.HandleJump(); 
+                jumpCooldownTimer = jumpCooldown; 
             }
         }
-        
-        // (โค้ด Stamina... เหมือนเดิม)
-        movement.HandleStamina(delta, isSprinting, isRolling, inputHandler.moveInput.magnitude);
 
-        // (โค้ดเช็คบัฟเฟอร์... เหมือนเดิม)
-        if (rollBufferTimer > 0 && !isRolling)
+        // (Roll Buffer)
+        if (inputHandler.rollInput) { rollBufferTimer = rollHandler.rollBufferTime; }
+        else { if (rollBufferTimer > 0) { rollBufferTimer -= delta; } }
+        
+        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
+        // (ส่ง "ความตั้งใจ" (isTryingToSprint) ไปให้ "Stamina" จัดการ)
+        movement.HandleStamina(delta, isTryingToSprint, isRolling, inputHandler.moveInput.magnitude);
+
+        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
+        // (คำนวณ "สถานะวิ่งจริง" ... ต้อง "ตั้งใจ" + "มี Stamina")
+        isSprinting = isTryingToSprint && stats.currentStamina > 0; // <--- 2. นี่คือ "สถานะวิ่งจริง"
+
+        // (Roll Check)
+        if (rollBufferTimer > 0 && !isRolling && !isLanding) 
         {
             rollBufferTimer = 0; 
-            rollHandler.TryRoll(); // (คราวนี้... isGrounded จะ "เสถียร" แล้ว!)
+            rollHandler.TryRoll(); 
         }
         
         isRolling = rollHandler.isRolling; 
 
-        if (isRolling) return;
+        // (*** "กันสไลด์" ***)
+        // (ถ้า "กลิ้ง" หรือ "ลงพื้น" ... ให้หยุด "โค้ดส่วนล่าง" ทันที)
+        if (isRolling || isLanding) return;
+        
+        // (*** "บั๊ก Momentum" ถูกแก้แล้ว ***)
+        // (เรา "ลบ" if (!isGrounded) return; ทิ้งไปแล้ว!)
+        // (ดังนั้น... HandleMovement จะ "ทำงานกลางอากาศ" ได้!)
 
-        // (โค้ดที่เหลือ... เหมือนเดิม)
+        // (โค้ดที่เหลือ... ส่ง "สถานะวิ่งจริง" (isSprinting) ไปให้ลูกน้อง)
         bool isLockOnSprinting = (lockedTarget != null && isSprinting && inputHandler.moveInput.magnitude > 0.1f);
 
         lockedTarget = lockOn.HandleLockOn(delta, inputHandler.moveInput, isRolling, isLockOnSprinting);
         animHandler.SetLockedOn(lockedTarget != null);
-        animHandler.SetSprinting(isSprinting); 
+        animHandler.SetSprinting(isSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
 
-        movement.HandleMovement(delta, inputHandler.moveInput, isSprinting, lockedTarget, cameraMainTransform, isLockOnSprinting);
+        movement.HandleMovement(delta, inputHandler.moveInput, isSprinting, lockedTarget, cameraMainTransform, isLockOnSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
         
-        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting);
+        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
     }
 
     private void FixedUpdate()
     {
-        // (โค้ด Gravity... เหมือนเดิม)
-        // (แต่คราวนี้มันจะ "เสถียร" ขึ้นด้วย เพราะ isGrounded ของเรานิ่งกว่า)
         movement.HandleGravity();
     }
 }
