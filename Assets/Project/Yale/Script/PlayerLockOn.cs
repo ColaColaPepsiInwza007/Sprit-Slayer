@@ -1,20 +1,18 @@
-using Unity.Cinemachine; // <--- V.3
+using Unity.Cinemachine; 
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-// (เวอร์ชัน "กล้อง FreeLook" - ตัวละครล็อคเป้า แต่กล้องเป็นอิสระ)
 public class PlayerLockOn : MonoBehaviour
 {
     private PlayerManager manager;
 
     [Header("Camera Setup")]
     // (เราไม่จำเป็นต้องยุ่งกับ Animator หรือ VCam อีกต่อไป)
-    // [SerializeField] private Animator cinemachineAnimator; 
-    // [SerializeField] private CinemachineCamera lockOnCamera; 
 
     [Header("Lock-On Settings")]
     [SerializeField] private LayerMask enemyLayer; 
+    [SerializeField] private LayerMask playerLayer; // (อันนี้คือที่เราแก้บั๊ก Raycast ชนตัวเอง)
     [SerializeField] private float maxLockOnDistance = 20f; 
     [SerializeField] private float minLockOnDot = 0.5f; 
     [SerializeField] private Transform playerTargetIcon; 
@@ -25,19 +23,15 @@ public class PlayerLockOn : MonoBehaviour
     private float lastSwitchTime;
     private bool canSwitch;
 
-    // (เราไม่จำเป็นต้องใช้ Damping หรือ TargetGroup อีก)
-    // private Cinemachine3rdPersonFollow thirdPersonFollow;
-    // private float defaultDampingX;
-    // private float defaultDampingY;
-
     private List<Transform> availableTargets = new List<Transform>();
     private int currentTargetIndex = -1;
+    
+    private LayerMask raycastMask; 
 
     private void Awake()
     {
         manager = GetComponent<PlayerManager>();
-        
-        // (ส่วน Awake() ที่ยุ่งกับกล้อง ไม่จำเป็นต้องใช้แล้ว)
+        raycastMask = ~playerLayer; 
     }
 
     public void TryToggleLockOn()
@@ -52,8 +46,6 @@ public class PlayerLockOn : MonoBehaviour
         }
     }
 
-    // (ฟังก์ชันนี้ยังต้องทำงานเหมือนเดิมเป๊ะ!)
-    // (เพื่อ "หมุนตัวละคร" และ "เช็คระยะ" ศัตรู)
     public Transform HandleLockOn(float delta, Vector2 moveInput, bool isRolling, bool isLockOnSprinting)
     {
         if (manager.lockedTarget == null) return null;
@@ -73,12 +65,12 @@ public class PlayerLockOn : MonoBehaviour
             return null;
         }
 
-        // (ฟีเจอร์ "สลับเป้าหมาย" ยังคงทำงานได้!)
         HandleTargetSwitching(moveInput);
 
         if (playerTargetIcon != null)
         {
-            playerTargetIcon.position = manager.lockedTarget.position;
+            // (*** อัปเกรดเล็กน้อย: ให้ Icon ไปอยู่ที่ "กลางตัว" บอส ***)
+            playerTargetIcon.position = manager.lockedTarget.GetComponent<Collider>().bounds.center;
         }
 
         return manager.lockedTarget;
@@ -90,11 +82,15 @@ public class PlayerLockOn : MonoBehaviour
         Transform bestTarget = null;
         float highestDot = 0; 
 
+        // (*** 'hits' ในที่นี้คือ "Collider" ... ไม่ใช่ Transform ***)
         Collider[] hits = Physics.OverlapSphere(transform.position, maxLockOnDistance, enemyLayer);
 
-        foreach (var hit in hits)
+        foreach (var hit in hits) // (hit คือ Collider)
         {
-            Vector3 dirToEnemy = hit.transform.position - manager.cameraMainTransform.position;
+            // (*** นี่คือโค้ดที่แก้ "บั๊กยิงเท้า" ***)
+            Vector3 targetCenter = hit.bounds.center; // <--- 1. หา "จุดศูนย์กลางของ Collider"
+            Vector3 dirToEnemy = targetCenter - manager.cameraMainTransform.position; // <--- 2. เล็งไปที่ "กลางตัว"
+
             Vector3 camForward = manager.cameraMainTransform.forward;
             dirToEnemy.Normalize();
 
@@ -102,17 +98,20 @@ public class PlayerLockOn : MonoBehaviour
 
             if (dot < minLockOnDot) continue;
 
-            if (Physics.Raycast(manager.cameraMainTransform.position, dirToEnemy, out RaycastHit rayHit, maxLockOnDistance))
+            // (ยิง Raycast... แต่ใช้ "raycastMask" (ที่ "ไม่สนใจ" Layer Player))
+            if (Physics.Raycast(manager.cameraMainTransform.position, dirToEnemy, out RaycastHit rayHit, maxLockOnDistance, raycastMask))
             {
+                // (เช็คว่าชนกำแพง/เสา หรือไม่)
+                // (ถ้าสิ่งที่ Raycast ชน ไม่ใช่ Transform ของ Collider ที่เราเล็ง... ก็คือมีอะไรบัง)
                 if (rayHit.transform != hit.transform) continue; 
             }
 
-            availableTargets.Add(hit.transform);
+            availableTargets.Add(hit.transform); // (เก็บ Transform (ตัวแม่) ไว้)
 
             if (dot > highestDot)
             {
                 highestDot = dot;
-                bestTarget = hit.transform;
+                bestTarget = hit.transform; // (Best target คือ Transform)
             }
         }
 
@@ -124,10 +123,8 @@ public class PlayerLockOn : MonoBehaviour
         }
     }
 
-    // (ฟังก์ชันนี้ไม่จำเป็นต้องใช้แล้ว เพราะเราไม่ได้สลับกล้อง)
     public void SetRollDamping(bool isDamping)
     {
-        // if (thirdPersonFollow == null) return;
         // ... (ไม่ต้องทำอะไร) ...
     }
 
@@ -157,7 +154,6 @@ public class PlayerLockOn : MonoBehaviour
              return; 
         }
 
-        // (สลับเป้าหมายจริงๆ)
         LockOnTo(availableTargets[currentTargetIndex]);
         lastSwitchTime = Time.time;
         canSwitch = false; 
@@ -165,30 +161,15 @@ public class PlayerLockOn : MonoBehaviour
 
     private void LockOnTo(Transform target)
     {
-        // (*** โค้ดที่อัปเดต (คลีน) ***)
-        
-        // 1. บอก Manager (เพื่อให้ตัวละครเปลี่ยนโหมด)
         manager.lockedTarget = target;
-        
-        // 2. (ปิดโค้ดส่วนที่ Crash)
-        // cinemachineAnimator.Play("TargetLock"); 
-
         if (playerTargetIcon != null) playerTargetIcon.gameObject.SetActive(true);
     }
 
     private void UnlockTarget()
     {
-        // (*** โค้ดที่อัปเดต (คลีน) ***)
-        
-        // 1. บอก Manager
         manager.lockedTarget = null;
-        
-        // 2. (ปิดโค้ดส่วนที่ Crash)
-        // cinemachineAnimator.Play("FreeLook"); 
-
         availableTargets.Clear();
         currentTargetIndex = -1;
-
         if (playerTargetIcon != null) playerTargetIcon.gameObject.SetActive(false);
     }
 

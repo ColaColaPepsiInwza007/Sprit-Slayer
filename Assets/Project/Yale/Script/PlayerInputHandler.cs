@@ -8,9 +8,10 @@ public class PlayerInputHandler : MonoBehaviour
     public bool isSprinting { get; private set; }
     public bool rollInput { get; private set; } 
     public bool jumpInput { get; private set; } 
-
-    // (*** โค้ดใหม่ ***)
-    public bool drawWeaponInput { get; private set; } // <--- 1. เพิ่มตัวแปรปุ่มชักดาบ
+    public bool drawWeaponInput { get; private set; }
+    
+    // (*** โค้ดใหม่ 1/2 ***)
+    public bool toggleMouseInput { get; private set; } // <--- เพิ่มตัวแปรปุ่มสลับเมาส์
 
     private PlayerManager manager;
 
@@ -38,8 +39,9 @@ public class PlayerInputHandler : MonoBehaviour
         isSprinting = playerControls.Player.Sprint.IsPressed();
         rollInput = playerControls.Player.Roll.WasPressedThisFrame();
         jumpInput = playerControls.Player.Jump.WasPressedThisFrame(); 
+        drawWeaponInput = playerControls.Player.DrawWeapon.WasPressedThisFrame();
         
-        // (*** โค้ดใหม่ ***)
-        drawWeaponInput = playerControls.Player.DrawWeapon.WasPressedThisFrame(); // <--- 2. อ่านค่าทุกเฟรม
+        // (*** โค้ดใหม่ 2/2 ***)
+        toggleMouseInput = playerControls.Player.ToggleMouse.WasPressedThisFrame(); // <--- อ่านค่าปุ่มสลับเมาส์
     }
 }

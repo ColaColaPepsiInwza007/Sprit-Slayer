@@ -1,22 +1,14 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(PlayerStats))]
-[RequireComponent(typeof(PlayerInputHandler))]
-[RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerAnimator))]
-[RequireComponent(typeof(PlayerLockOn))]
-[RequireComponent(typeof(PlayerRoll))]
+// (RequireComponent... เหมือนเดิม)
 public class PlayerManager : MonoBehaviour
 {
     [Header("Action States")]
     public bool isLanding = false; 
 
-    // (*** โค้ดใหม่: อ้างอิงแบบแยกส่วน ***)
     [Header("Weapon Sockets")]
-    public GameObject weaponInHand;     // (ลาก "ดาบในมือ" (ลูกของ Weapon_Socket) มาใส่)
-    public GameObject swordInScabbard;  // (ลาก "ดาบในปลอก" (ลูกของ ปลอกดาบ) มาใส่)
+    public GameObject weaponInHand;     
+    public GameObject swordInScabbard;  
 
     [Header("Core Components")]
     public CharacterController controller;
@@ -29,15 +21,21 @@ public class PlayerManager : MonoBehaviour
     public PlayerRoll rollHandler;
 
     [Header("Player State")]
-    public bool isWeaponDrawn = false; // <--- (โค้ดใหม่: สถานะชักดาบ)
+    public bool isWeaponDrawn = false; 
     public bool isSprinting; 
     public bool isRolling;
     public bool isGrounded;
     public Transform lockedTarget; 
 
+    // (*** โค้ดใหม่ 1/6 ***)
+    [Header("Mouse Lock Settings")]
+    public bool isMouseLocked = true; // <--- สถานะเมาส์
+
     [Header("Camera")]
     public Transform cameraMainTransform;
 
+    // (Header... Ground Check, Stamina ... เหมือนเดิม)
+    // ...
     [Header("Ground Check Settings")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float groundCheckRadius = 0.3f;
@@ -53,6 +51,7 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
+        // (โค้ด Awake... เหมือนเดิม)
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStats>();
@@ -70,33 +69,48 @@ public class PlayerManager : MonoBehaviour
         groundCheckOffset = new Vector3(0, controller.center.y, 0); 
         animator.applyRootMotion = false; 
         
-        // (*** โค้ดใหม่: เซ็ตสถานะเริ่มต้น ***)
-        // (เราจะใช้ Logic ที่ถูกต้องสำหรับโมเดลที่แยกส่วน)
         weaponInHand.SetActive(false);
         swordInScabbard.SetActive(true);
         isWeaponDrawn = false;
+        
+        // (*** โค้ดใหม่ 2/6 ***)
+        LockMouse(); // <--- สั่งล็อคเมาส์ทันทีที่เกมเริ่ม
     }
     
-    // (*** โค้ดใหม่: ฟังก์ชันสลับดาบ ***)
-    public void ToggleWeapon()
+    // (*** โค้ดใหม่ 3/6: ฟังก์ชันสลับเมาส์ ***)
+    public void ToggleMouseLock()
     {
-        // (กันไม่ให้ชักดาบตอนกลิ้ง/โดด/ตก)
-        if (isRolling || isLanding || !isGrounded) return; 
-
-        // (สลับค่า true/false)
-        isWeaponDrawn = !isWeaponDrawn; 
-
-        // (นี่คือ Logic ที่นายต้องการ!)
-        weaponInHand.SetActive(isWeaponDrawn);        // ถ้าชักดาบ (true) -> โชว์ดาบที่มือ
-        swordInScabbard.SetActive(!isWeaponDrawn);    // ถ้าชักดาบ (true) -> ซ่อนดาบในปลอก
-        
-        // (*** โค้ดสำหรับ Part 2 (ที่นายข้าม) และ Part 3 ***)
-        // (เดี๋ยวเราจะกลับมาเปิดใช้บรรทัดนี้)
-        // animHandler.SetArmed(isWeaponDrawn); 
+        isMouseLocked = !isMouseLocked; // (สลับค่า true/false)
+        if (isMouseLocked)
+        {
+            LockMouse();
+        }
+        else
+        {
+            UnlockMouse();
+        }
     }
 
+    // (*** โค้ดใหม่ 4/6: ฟังก์ชันล็อคเมาส์ ***)
+    private void LockMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked; // <--- ล็อคเมาส์ให้อยู่กลางจอ
+        Cursor.visible = false;                   // <--- ซ่อนเมาส์
+        isMouseLocked = true;
+    }
+
+    // (*** โค้ดใหม่ 5/6: ฟังก์ชันปลดล็อคเมาส์ ***)
+    private void UnlockMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;   // <--- ปล่อยเมาส์เป็นอิสระ
+        Cursor.visible = true;                    // <--- โชว์เมาส์
+        isMouseLocked = false;
+    }
+
+    // (HandleGroundCheck... เหมือนเดิม)
     private void HandleGroundCheck()
     {
+        //...
         Vector3 spherePosition = transform.position + groundCheckOffset;
         if (Physics.SphereCast(spherePosition, groundCheckRadius, Vector3.down, 
                                out RaycastHit hit, groundCheckDistance, groundLayer))
@@ -109,7 +123,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // (*** โค้ดใหม่: เพิ่ม 1 บรรทัดใน Update() ***)
     private void Update()
     {
         float delta = Time.deltaTime;
@@ -122,18 +135,27 @@ public class PlayerManager : MonoBehaviour
             jumpCooldownTimer -= delta;
         }
         
-        // (*** โค้ดใหม่: เพิ่มการเช็คปุ่มชักดาบ ***)
+        // (*** โค้ดใหม่ 6/6: เพิ่มการเช็คปุ่มสลับเมาส์ ***)
+        if (inputHandler.toggleMouseInput)
+        {
+            ToggleMouseLock();
+        }
+
         if (inputHandler.drawWeaponInput)
         {
             ToggleWeapon();
         }
 
         // (โค้ดที่เหลือเหมือนเดิมเป๊ะ)
+        // ... (Sprint, Roll, Jump, Stamina) ...
+        // ...
+        
         bool isTryingToSprint = inputHandler.isSprinting; 
         isRolling = rollHandler.isRolling; 
         
         if (inputHandler.jumpInput && isGrounded && !isRolling && !isLanding && jumpCooldownTimer <= 0) 
         {
+            // (โค้ด Jump)
             if (stats.currentStamina >= jumpStaminaCost) 
             {
                 stats.currentStamina -= jumpStaminaCost; 
@@ -167,11 +189,21 @@ public class PlayerManager : MonoBehaviour
 
         movement.HandleMovement(delta, inputHandler.moveInput, isSprinting, lockedTarget, cameraMainTransform, isLockOnSprinting); 
         
-        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting); 
+        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting);
     }
 
     private void FixedUpdate()
     {
         movement.HandleGravity();
+    }
+    
+    // (ฟังก์ชัน ToggleWeapon... เหมือนเดิม)
+    public void ToggleWeapon()
+    {
+        if (isRolling || isLanding || !isGrounded) return; 
+        isWeaponDrawn = !isWeaponDrawn; 
+        weaponInHand.SetActive(isWeaponDrawn);        
+        swordInScabbard.SetActive(!isWeaponDrawn);    
+        // animHandler.SetArmed(isWeaponDrawn); 
     }
 }

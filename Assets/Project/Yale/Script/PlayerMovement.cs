@@ -4,6 +4,9 @@ public class PlayerMovement : MonoBehaviour
 {
     private PlayerManager manager; 
     private Vector3 playerVelocity;
+    
+    // (*** โค้ดใหม่ 1/4: ตัวแปร "จำ" โมเมนตัม ***)
+    private Vector3 airMomentum; // (ตัวเก็บโมเมนตัมแนวนอน)
 
     [Header("Movement Settings")]
     [SerializeField] private float playerSpeed = 3.0f;
@@ -14,7 +17,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jump Settings")]
     [SerializeField] private float jumpHeight = 1.8f; 
     [SerializeField] private float groundCheckStickForce = -2f; 
-    [SerializeField] private float airControlMultiplier = 0.5f; // <--- (โค้ดใหม่: คุมตัวกลางอากาศ 50%)
+    
+    // (*** โค้ดใหม่ 2/4: เราลบ "airControlMultiplier" ทิ้งไปเลย ***)
+    // [SerializeField] private float airControlMultiplier = 0.5f; // (ลบทิ้ง!)
 
     [Header("Stamina Settings")]
     [SerializeField] private float staminaDepleteRate = 15f; 
@@ -25,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         manager = GetComponent<PlayerManager>();
+        airMomentum = Vector3.zero; // (*** โค้ดใหม่ 3/4: รีเซ็ตค่าเริ่มต้น ***)
     }
 
     public void HandleGravity()
@@ -40,17 +46,16 @@ public class PlayerMovement : MonoBehaviour
     
     public void HandleJump()
     {
+        // (ฟังก์ชันนี้เหมือนเดิมเป๊ะ! ... `airMomentum` จะถูกเซ็ตจาก HandleMovement)
         playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
         manager.animHandler.TriggerJump();
     }
 
-    // (*** โค้ดอัปเกรด (แก้บั๊กวิ่งฟรี) ***)
-    // <--- (เปลี่ยน 'isSprinting' เป็น 'isTryingToSprint')
+    // (HandleStamina... เหมือนเดิม)
     public void HandleStamina(float delta, bool isTryingToSprint, bool isRolling, float moveAmount)
     {
+        // (โค้ดเหมือนเดิม)
         bool isMoving = moveAmount > 0.1f;
-
-        // (เช็ค "ความตั้งใจ" ที่จะวิ่ง)
         if (isTryingToSprint && manager.stats.currentStamina > 0 && isMoving && !isRolling) 
         {
             manager.stats.currentStamina -= staminaDepleteRate * delta; 
@@ -72,14 +77,14 @@ public class PlayerMovement : MonoBehaviour
         manager.stats.UpdateStaminaBar();
     }
     
-    // (*** โค้ดอัปเกรด (แก้บั๊ก Momentum + Air Control) ***)
+    // (*** โค้ดอัปเกรด (V.10 - Committed Jumps) ***)
     public void HandleMovement(float delta, Vector2 moveInput, bool isSprinting, Transform lockedTarget, Transform cameraMainTransform, bool isLockOnSprinting)
     {
         float moveAmount = moveInput.magnitude;
         Vector3 moveDirection = (cameraMainTransform.forward * moveInput.y) + (cameraMainTransform.right * moveInput.x);
         moveDirection.y = 0;
         
-        // (*** โค้ดใหม่: แยก Logic "พื้น" กับ "อากาศ" ***)
+        // (*** โค้ดใหม่ 4/4: แก้ไข Logic ทั้งหมดในนี้ ***)
         
         if (manager.isGrounded)
         {
@@ -88,13 +93,17 @@ public class PlayerMovement : MonoBehaviour
             {
                 float currentSpeed = playerSpeed;
                 
-                // (เช็ค "สถานะวิ่งจริง" ... Manager คำนวณ Stamina มาให้แล้ว)
                 if (isSprinting) 
                 {
                     currentSpeed = sprintSpeed;
                 }
                 
-                manager.controller.Move(moveDirection.normalized * currentSpeed * delta);
+                // (อัปเดต "โมเมนตัม" ตลอดเวลาที่เดินบนพื้น)
+                // (นี่คือค่าที่เราจะ "จำ" ไว้ใช้ตอนกระโดด)
+                airMomentum = moveDirection.normalized * currentSpeed;
+                
+                // (ใช้โมเมนตัมนี้เคลื่อนที่)
+                manager.controller.Move(airMomentum * delta);
                 
                 // (Logic การหมุนตัว... เหมือนเดิม)
                 if (lockedTarget != null && !isLockOnSprinting)
@@ -107,13 +116,20 @@ public class PlayerMovement : MonoBehaviour
                     manager.movement.HandleFreeLookRotation(moveDirection.normalized, delta);
                 }
             }
+            else
+            {
+                // (ถ้าหยุดเดินบนพื้น... ก็ต้องรีเซ็ตโมเมนตัม)
+                // (กันบั๊ก "ยืนโดด" แล้วตัวพุ่ง)
+                airMomentum = Vector3.zero;
+            }
         }
         else
         {
-            // === 2. อยู่กลางอากาศ (Air Control) ===
-            // (เรายังขยับตัวได้ แต่ "ช้าลง" ... นี่คือ Momentum ที่หายไป)
-            float airSpeed = playerSpeed * airControlMultiplier;
-            manager.controller.Move(moveDirection.normalized * airSpeed * delta);
+            // === 2. อยู่กลางอากาศ (Committed Jump) ===
+            // (เราไม่ "อ่าน Input" ใหม่)
+            // (เราใช้ `airMomentum` ที่ "จำ" ไว้จากตอนที่อยู่บนพื้น)
+            // (HandleGravity() จะจัดการเรื่องดิ่งลงเอง)
+            manager.controller.Move(airMomentum * delta);
         }
     }
 
