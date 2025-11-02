@@ -13,6 +13,11 @@ public class PlayerManager : MonoBehaviour
     [Header("Action States")]
     public bool isLanding = false; 
 
+    // (*** โค้ดใหม่: อ้างอิงแบบแยกส่วน ***)
+    [Header("Weapon Sockets")]
+    public GameObject weaponInHand;     // (ลาก "ดาบในมือ" (ลูกของ Weapon_Socket) มาใส่)
+    public GameObject swordInScabbard;  // (ลาก "ดาบในปลอก" (ลูกของ ปลอกดาบ) มาใส่)
+
     [Header("Core Components")]
     public CharacterController controller;
     public Animator animator;
@@ -24,7 +29,8 @@ public class PlayerManager : MonoBehaviour
     public PlayerRoll rollHandler;
 
     [Header("Player State")]
-    public bool isSprinting; // <--- (ค่า "ที่แท้จริง" จะถูกคำนวณใน Update)
+    public bool isWeaponDrawn = false; // <--- (โค้ดใหม่: สถานะชักดาบ)
+    public bool isSprinting; 
     public bool isRolling;
     public bool isGrounded;
     public Transform lockedTarget; 
@@ -63,8 +69,32 @@ public class PlayerManager : MonoBehaviour
 
         groundCheckOffset = new Vector3(0, controller.center.y, 0); 
         animator.applyRootMotion = false; 
+        
+        // (*** โค้ดใหม่: เซ็ตสถานะเริ่มต้น ***)
+        // (เราจะใช้ Logic ที่ถูกต้องสำหรับโมเดลที่แยกส่วน)
+        weaponInHand.SetActive(false);
+        swordInScabbard.SetActive(true);
+        isWeaponDrawn = false;
     }
     
+    // (*** โค้ดใหม่: ฟังก์ชันสลับดาบ ***)
+    public void ToggleWeapon()
+    {
+        // (กันไม่ให้ชักดาบตอนกลิ้ง/โดด/ตก)
+        if (isRolling || isLanding || !isGrounded) return; 
+
+        // (สลับค่า true/false)
+        isWeaponDrawn = !isWeaponDrawn; 
+
+        // (นี่คือ Logic ที่นายต้องการ!)
+        weaponInHand.SetActive(isWeaponDrawn);        // ถ้าชักดาบ (true) -> โชว์ดาบที่มือ
+        swordInScabbard.SetActive(!isWeaponDrawn);    // ถ้าชักดาบ (true) -> ซ่อนดาบในปลอก
+        
+        // (*** โค้ดสำหรับ Part 2 (ที่นายข้าม) และ Part 3 ***)
+        // (เดี๋ยวเราจะกลับมาเปิดใช้บรรทัดนี้)
+        // animHandler.SetArmed(isWeaponDrawn); 
+    }
+
     private void HandleGroundCheck()
     {
         Vector3 spherePosition = transform.position + groundCheckOffset;
@@ -79,7 +109,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // (*** Update() ฉบับอัปเกรด (Final V.9) ***)
+    // (*** โค้ดใหม่: เพิ่ม 1 บรรทัดใน Update() ***)
     private void Update()
     {
         float delta = Time.deltaTime;
@@ -91,15 +121,17 @@ public class PlayerManager : MonoBehaviour
         {
             jumpCooldownTimer -= delta;
         }
+        
+        // (*** โค้ดใหม่: เพิ่มการเช็คปุ่มชักดาบ ***)
+        if (inputHandler.drawWeaponInput)
+        {
+            ToggleWeapon();
+        }
 
-        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
-        bool isTryingToSprint = inputHandler.isSprinting; // <--- 1. อ่าน "ความตั้งใจ" (ปุ่ม)
+        // (โค้ดที่เหลือเหมือนเดิมเป๊ะ)
+        bool isTryingToSprint = inputHandler.isSprinting; 
         isRolling = rollHandler.isRolling; 
         
-        // (*** โค้ดแก้บั๊ก "กระโดด" ***)
-        // (เรายังไม่เช็ค isGrounded... เพื่อให้โค้ดส่วน "Stamina" ทำงานกลางอากาศได้)
-        
-        // (เช็คอินพุต "กระโดด")
         if (inputHandler.jumpInput && isGrounded && !isRolling && !isLanding && jumpCooldownTimer <= 0) 
         {
             if (stats.currentStamina >= jumpStaminaCost) 
@@ -111,19 +143,12 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        // (Roll Buffer)
         if (inputHandler.rollInput) { rollBufferTimer = rollHandler.rollBufferTime; }
         else { if (rollBufferTimer > 0) { rollBufferTimer -= delta; } }
         
-        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
-        // (ส่ง "ความตั้งใจ" (isTryingToSprint) ไปให้ "Stamina" จัดการ)
         movement.HandleStamina(delta, isTryingToSprint, isRolling, inputHandler.moveInput.magnitude);
+        isSprinting = isTryingToSprint && stats.currentStamina > 0; 
 
-        // (*** โค้ดแก้บั๊ก "วิ่งฟรี" ***)
-        // (คำนวณ "สถานะวิ่งจริง" ... ต้อง "ตั้งใจ" + "มี Stamina")
-        isSprinting = isTryingToSprint && stats.currentStamina > 0; // <--- 2. นี่คือ "สถานะวิ่งจริง"
-
-        // (Roll Check)
         if (rollBufferTimer > 0 && !isRolling && !isLanding) 
         {
             rollBufferTimer = 0; 
@@ -132,24 +157,17 @@ public class PlayerManager : MonoBehaviour
         
         isRolling = rollHandler.isRolling; 
 
-        // (*** "กันสไลด์" ***)
-        // (ถ้า "กลิ้ง" หรือ "ลงพื้น" ... ให้หยุด "โค้ดส่วนล่าง" ทันที)
         if (isRolling || isLanding) return;
         
-        // (*** "บั๊ก Momentum" ถูกแก้แล้ว ***)
-        // (เรา "ลบ" if (!isGrounded) return; ทิ้งไปแล้ว!)
-        // (ดังนั้น... HandleMovement จะ "ทำงานกลางอากาศ" ได้!)
-
-        // (โค้ดที่เหลือ... ส่ง "สถานะวิ่งจริง" (isSprinting) ไปให้ลูกน้อง)
         bool isLockOnSprinting = (lockedTarget != null && isSprinting && inputHandler.moveInput.magnitude > 0.1f);
 
         lockedTarget = lockOn.HandleLockOn(delta, inputHandler.moveInput, isRolling, isLockOnSprinting);
         animHandler.SetLockedOn(lockedTarget != null);
-        animHandler.SetSprinting(isSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
+        animHandler.SetSprinting(isSprinting); 
 
-        movement.HandleMovement(delta, inputHandler.moveInput, isSprinting, lockedTarget, cameraMainTransform, isLockOnSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
+        movement.HandleMovement(delta, inputHandler.moveInput, isSprinting, lockedTarget, cameraMainTransform, isLockOnSprinting); 
         
-        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting); // <--- (ใช้ "สถานะวิ่งจริง")
+        animHandler.UpdateMovementParameters(inputHandler.moveInput, isSprinting, lockedTarget, isLockOnSprinting); 
     }
 
     private void FixedUpdate()

@@ -7,9 +7,10 @@ public class PlayerInputHandler : MonoBehaviour
     public Vector2 moveInput { get; private set; }
     public bool isSprinting { get; private set; }
     public bool rollInput { get; private set; } 
-    
+    public bool jumpInput { get; private set; } 
+
     // (*** โค้ดใหม่ ***)
-    public bool jumpInput { get; private set; } // <--- เพิ่มตัวแปร Jump
+    public bool drawWeaponInput { get; private set; } // <--- 1. เพิ่มตัวแปรปุ่มชักดาบ
 
     private PlayerManager manager;
 
@@ -36,8 +37,9 @@ public class PlayerInputHandler : MonoBehaviour
         moveInput = playerControls.Player.Move.ReadValue<Vector2>();
         isSprinting = playerControls.Player.Sprint.IsPressed();
         rollInput = playerControls.Player.Roll.WasPressedThisFrame();
+        jumpInput = playerControls.Player.Jump.WasPressedThisFrame(); 
         
         // (*** โค้ดใหม่ ***)
-        jumpInput = playerControls.Player.Jump.WasPressedThisFrame(); // <--- อ่านค่าปุ่ม Jump ทุกเฟรม
+        drawWeaponInput = playerControls.Player.DrawWeapon.WasPressedThisFrame(); // <--- 2. อ่านค่าทุกเฟรม
     }
 }
