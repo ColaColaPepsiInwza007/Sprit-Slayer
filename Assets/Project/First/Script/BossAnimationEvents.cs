@@ -17,7 +17,6 @@ public class BossAnimationEvents : MonoBehaviour
         if (manager.currentState == BossManager.BossState.Attack)
         {
             manager.currentState = BossManager.BossState.Chase;
-            // DEBUG: ยืนยันการออกจาก State
             Debug.Log("Boss: Attack Finished (Event Fired), Back to CHASE.");
         }
     }

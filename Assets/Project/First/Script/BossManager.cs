@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// มั่นใจว่ามี Component ที่จำเป็นอยู่บน GameObject เดียวกัน
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(BossMovement))] 
 [RequireComponent(typeof(BossAnimator))] 
@@ -11,8 +10,8 @@ public class BossManager : MonoBehaviour
     public enum BossState
     {
         Idle,
-        Chase,
-        Attack,     // Boss จะติดอยู่ใน State นี้จนกว่า Animation Event จะถูกยิง
+        Chase,      // เดินตรงเข้าหา/ตอบโต้การเคลื่อนไหว
+        Attack,     
         Stunned,
         Dead
     }
@@ -30,8 +29,12 @@ public class BossManager : MonoBehaviour
     public float rotationSpeed = 10.0f;
     public float stoppingDistance = 1.5f; 
 
+    [Header("Tactical Movement")] // <--- ตัวแปรสำหรับ Logic การตอบโต้
+    [SerializeField] public float strafeSpeed = 4.5f;        // ความเร็วในการเดินสวนทาง
+    [SerializeField] public float baitingDistance = 6.0f;   // ระยะที่ Boss จะพิจารณาเดินวน/เอียง
+
     [Header("Attack Settings")]
-    public float attackCooldown = 2f;
+    public float attackCooldown = 0.5f;
     private float attackTimer;
 
     private void Awake()
@@ -62,7 +65,7 @@ public class BossManager : MonoBehaviour
                 break;
 
             case BossState.Attack:
-                // (*** โค้ดแก้บั๊กสำคัญ: หยุดแอนิเมชันเดินทันที! ***)
+                // หยุดแอนิเมชันเดินทันที และรอให้ Animation Event สั่งเปลี่ยน State กลับ
                 if (bossAnim != null) bossAnim.UpdateMovement(0f); 
                 
                 if (playerTarget == null) 
@@ -78,11 +81,12 @@ public class BossManager : MonoBehaviour
                 }
                 break;
                 
-            // ... (สถานะอื่น ๆ)
+            case BossState.Idle:
+                if (bossAnim != null) bossAnim.UpdateMovement(0f);
+                break;
         }
     }
 
-    // ฟังก์ชันที่ BossMovement เรียกเพื่อเริ่มการโจมตี
     public void RequestAttack()
     {
         if (currentState == BossState.Attack || attackTimer > 0)
@@ -90,7 +94,6 @@ public class BossManager : MonoBehaviour
             return;
         }
         
-        // DEBUG: ยืนยันการเปลี่ยน State
         Debug.Log("Boss: Requesting Attack. State set to ATTACK.");
         
         currentState = BossState.Attack;
@@ -99,15 +102,10 @@ public class BossManager : MonoBehaviour
 
     private void DecideAndExecuteAttack()
     {
-        // 1. สั่งให้ทำแอนิเมชันโจมตีท่าที่ 1
         if (bossAnim != null) bossAnim.TriggerAttack(1); 
         
-        // DEBUG: ยืนยันการยิง Trigger
         Debug.Log("Boss: Trigger 'Attack' Fired!");
         
-        // 2. เริ่ม Cooldown
         attackTimer = attackCooldown;
-        
-        // 3. Boss จะติดอยู่ใน State.Attack จนกว่า Animation Event จะถูกยิง
     }
 }

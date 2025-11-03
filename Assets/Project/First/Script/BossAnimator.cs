@@ -19,7 +19,6 @@ public class BossAnimator : MonoBehaviour
     public void UpdateMovement(float moveAmount)
     {
         if (animator == null) return;
-        // ใช้ MoveY เพื่อเปลี่ยนระหว่าง Idle/Walk
         animator.SetFloat("MoveY", moveAmount, 0.1f, Time.deltaTime);
     }
     
@@ -28,7 +27,6 @@ public class BossAnimator : MonoBehaviour
     {
         if (animator == null) return;
         
-        // สั่ง Trigger "Attack" เท่านั้น
         animator.SetTrigger("Attack");
     }
 }
