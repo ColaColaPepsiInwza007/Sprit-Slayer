@@ -1,0 +1,463 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7294110296926659695
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da692e001514ec24dbc4cca1949ff7e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 12
+  hdPluginSubTargetMaterialVersions:
+    m_Keys: []
+    m_Values: 
+--- !u!114 &-3669312987719343048
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 10
+--- !u!114 &-1917747736415251223
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 639247ca83abc874e893eb93af2b5e44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 0
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Rock_Gravel_01
+  m_Shader: {fileID: -6465566751694194690, guid: eba39cbbf4e2b9049bbcaf56f3824bd0, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _AXF_BRDF_TYPE_SVBRDF
+  - _DISABLE_SSR_TRANSPARENT
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2225
+  stringTagMap:
+    MotionVector: User
+    RenderType: Opaque
+  disabledShaderPasses:
+  - TransparentDepthPrepass
+  - TransparentDepthPostpass
+  - TransparentBackface
+  - RayTracingPrepass
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 1ffbb5d20ab168f44b93ad9c70e6c1e2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CarPaint2_BRDFColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CarPaint2_BTFFlakeMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CarPaint2_FlakeThetaFISliceLUTMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ChannelPackedNormal_RG_B:
+        m_Texture: {fileID: 2800000, guid: 1021f8767b4a87642a8d51c52d3372b8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ClearcoatNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Emissive:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossDiffuse:
+        m_Texture: {fileID: 2800000, guid: 81c0ea3edb4a496408a81300c0b5604a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossGloss:
+        m_Texture: {fileID: 2800000, guid: 7db260c688ff1604d932543e9e69af2a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossNormal:
+        m_Texture: {fileID: 2800000, guid: 81721e8841a9c1d41bf7cf20d664e3f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal:
+        m_Texture: {fileID: 2800000, guid: c5a59d62809b54544a9f470be9acfb35, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: c5a59d62809b54544a9f470be9acfb35, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ORM:
+        m_Texture: {fileID: 2800000, guid: 35f8968cc40d68c4c81ba8f29fd22b8f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OpacityMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RGB_Mask:
+        m_Texture: {fileID: 2800000, guid: 79cd1dcbbb767a146af34cbfccb8332b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Rock01_BaseMap:
+        m_Texture: {fileID: 2800000, guid: 1ffbb5d20ab168f44b93ad9c70e6c1e2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Rock01_Normal:
+        m_Texture: {fileID: 2800000, guid: c5a59d62809b54544a9f470be9acfb35, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Rock01_ORH:
+        m_Texture: {fileID: 2800000, guid: 35f8968cc40d68c4c81ba8f29fd22b8f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RockDiffuse:
+        m_Texture: {fileID: 2800000, guid: 1ffbb5d20ab168f44b93ad9c70e6c1e2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RockGloss:
+        m_Texture: {fileID: 2800000, guid: 35f8968cc40d68c4c81ba8f29fd22b8f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RockNormal:
+        m_Texture: {fileID: 2800000, guid: c5a59d62809b54544a9f470be9acfb35, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_AlphaMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_AnisoRotationMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_ClearcoatColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_ClearcoatIORMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_DiffuseColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_FresnelMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_HeightMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_SpecularColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SVBRDF_SpecularLobeMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_16b89cfc609042cfaa2d8ec3f9a647d7_Texture_1:
+        m_Texture: {fileID: 2800000, guid: e37c1868dd054d74fb59951b71032657, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_2b1f764dfb464abea3ac4170f826fb1c_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 81721e8841a9c1d41bf7cf20d664e3f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_3443f08553624f15adaba3689e01e7db_Texture_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_357445e6b9b34498a5f66534e81047c0_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 7db260c688ff1604d932543e9e69af2a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_48ebaa608b0b489ea1ae0670bb8a5dc9_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 81721e8841a9c1d41bf7cf20d664e3f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6d6dcf42c6d24c8a802b9af32ff0abfb_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 81c0ea3edb4a496408a81300c0b5604a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_dda16ca95d874e7bae294bff9aa7b747_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 7db260c688ff1604d932543e9e69af2a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_e48ab9900eeb4e58b018e50b055410bb_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 81c0ea3edb4a496408a81300c0b5604a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_4a9d6bf89d944e2cb4391216c6b6c38b_Out_0:
+        m_Texture: {fileID: 2800000, guid: 81c0ea3edb4a496408a81300c0b5604a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_8d9e534ba8014425953012a227aaa82c_Out_0:
+        m_Texture: {fileID: 2800000, guid: 7db260c688ff1604d932543e9e69af2a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _0: 0
+    - _2: 0
+    - _AO: 1
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaCutoff: 0.5
+    - _AlphaCutoffEnable: 0
+    - _AlphaCutoffShadow: 0.5
+    - _AlphaDstBlend: 0
+    - _AlphaSrcBlend: 1
+    - _AlphaToMask: 0
+    - _AlphaToMaskInspectorValue: 0
+    - _Alpha_Clip_Treshold: 0
+    - _AxF_BRDFType: 0
+    - _BUILTIN_AlphaClip: 0
+    - _BUILTIN_Blend: 0
+    - _BUILTIN_CullMode: 2
+    - _BUILTIN_DstBlend: 0
+    - _BUILTIN_QueueControl: -1
+    - _BUILTIN_QueueOffset: 0
+    - _BUILTIN_SrcBlend: 1
+    - _BUILTIN_Surface: 0
+    - _BUILTIN_ZTest: 4
+    - _BUILTIN_ZWrite: 1
+    - _BUILTIN_ZWriteControl: 0
+    - _BaseNormalStrength: 1
+    - _Blend: 0
+    - _BlendMode: 0
+    - _CarPaint2_BRDFColorMapScale: 1
+    - _CarPaint2_BTFFlakeMapScale: 1
+    - _CarPaint2_CTDiffuse: 0
+    - _CarPaint2_ClearcoatIOR: 1
+    - _CarPaint2_FixedColorThetaHForIndirectLight: 0.5
+    - _CarPaint2_FixedFlakesThetaHForIndirectLight: 0.2
+    - _CarPaint2_FlakeMaxThetaI: 0
+    - _CarPaint2_FlakeMaxThetaIF: 0
+    - _CarPaint2_FlakeNumThetaF: 0
+    - _CarPaint2_FlakeNumThetaFF: 0
+    - _CarPaint2_FlakeNumThetaI: 0
+    - _CarPaint2_FlakeNumThetaIF: 0
+    - _CarPaint2_LobeCount: 0
+    - _CastShadows: 1
+    - _ConservativeDepthOffsetEnable: 0
+    - _Contrast: 1
+    - _ContrastParam: 1
+    - _Cull: 2
+    - _CullMode: 2
+    - _CullModeForward: 2
+    - _Cutoff: 0.5
+    - _DepthOffsetEnable: 0
+    - _DoubleSidedEnable: 0
+    - _DoubleSidedGIMode: 0
+    - _DoubleSidedNormalMode: 2
+    - _DstBlend: 0
+    - _EmissiveFlicker: 0
+    - _Emissive_Power: 1
+    - _EnableBlendModePreserveSpecularLighting: 1
+    - _EnableFogOnTransparent: 1
+    - _EnableGeometricSpecularAA: 0
+    - _Flags: 0
+    - _FlagsB: 8388608
+    - _Flatness: 0.5
+    - _GlobalNormal: 2
+    - _GlobalRoughness: 1
+    - _Grunge_Roughness: 0.2
+    - _Input_Roughness_Contrast: 1
+    - _Input_Roughness_Max: 0
+    - _Input_Roughness_Min: 0
+    - _Level: 1
+    - _MappingMode: 0
+    - _Metallic: 0
+    - _MossDiffuseStrength: 1
+    - _MossGlossStrength: 1
+    - _MossNormalStrength: 1
+    - _Moss_Desaturation: 0.3
+    - _Moss_FlattenNormal: 0.25
+    - _Moss_Fuzz_CoreDarkness: 0.4
+    - _Moss_Fuzz_EdgeBrightness: 4
+    - _Moss_Fuzz_Power: 1.3
+    - _Moss_Tiling: 0.02
+    - _Moss_Vertex_Paint_Contrast: 1
+    - _Moss_Vertex_Paint_HeightLerp_Tiling: 3
+    - _NormalStrength: 1
+    - _OpacityMap: 0
+    - _OpaqueCullMode: 2
+    - _PlanarSpace: 0
+    - _QueueControl: 1
+    - _QueueOffset: 0
+    - _RayTracing: 0
+    - _RayTracingTexFilteringScale: 0.07
+    - _ReceiveShadows: 1
+    - _ReceivesSSR: 1
+    - _ReceivesSSRTransparent: 0
+    - _RefractionModel: 0
+    - _RenderQueueType: 1
+    - _RequireSplitLighting: 0
+    - _RockDiffuseStrength: 1
+    - _RockGlossStrength: 1
+    - _RockNormalStrength: 1
+    - _Rock_01_Tiling: 0.006
+    - _Rock_DirtMask_Contrast: 2.4
+    - _Rock_DirtMask_Intensity: 1
+    - _Rock_Edges_Mask_Contrast: 1
+    - _Rock_Edges_Mask_Intensity: 0.3
+    - _Rock_GrungeMask_Contrast: 3
+    - _Rock_GrungeMask_Intensity: 1
+    - _Roughness: 0.5
+    - _Roughness_Contrast: 1
+    - _Roughness_Max: 0
+    - _Roughness_Min: 0.5
+    - _SVBRDF_BRDFType: 0
+    - _SVBRDF_BRDFType_DiffuseType: 0
+    - _SVBRDF_BRDFType_SpecularType: 0
+    - _SVBRDF_BRDFVariants: 0
+    - _SVBRDF_BRDFVariants_BlinnType: 0
+    - _SVBRDF_BRDFVariants_FresnelType: 0
+    - _SVBRDF_BRDFVariants_WardType: 0
+    - _SVBRDF_HeightMapMaxMM: 0
+    - _SVBRDF_SpecularLobeMapScale: 1
+    - _Saturation: 1
+    - _SpecularAAScreenSpaceVariance: 0.1
+    - _SpecularAAThreshold: 0.2
+    - _SpecularOcclusionMode: 1
+    - _Speed: 0.7
+    - _SrcBlend: 1
+    - _StencilRef: 0
+    - _StencilRefDepth: 8
+    - _StencilRefDistortionVec: 4
+    - _StencilRefGBuffer: 10
+    - _StencilRefMV: 40
+    - _StencilWriteMask: 6
+    - _StencilWriteMaskDepth: 8
+    - _StencilWriteMaskDistortionVec: 4
+    - _StencilWriteMaskGBuffer: 14
+    - _StencilWriteMaskMV: 40
+    - _SupportDecals: 1
+    - _Surface: 0
+    - _SurfaceType: 0
+    - _TileMoss: 2
+    - _Tiling: 0
+    - _TransparentBackfaceEnable: 0
+    - _TransparentCullMode: 2
+    - _TransparentDepthPostpassEnable: 0
+    - _TransparentDepthPrepassEnable: 0
+    - _TransparentSortPriority: 0
+    - _TransparentWritingMotionVec: 0
+    - _TransparentZWrite: 0
+    - _UV: 1
+    - _UV_Tiling: 1
+    - _UpNode: 0.5
+    - _UseShadowThreshold: 0
+    - _Use_Emissive: 0
+    - _WSBlending: 1
+    - _WSIntensity: 0.75
+    - _WorkflowMode: 1
+    - _ZTest: 4
+    - _ZTestDepthEqualForOpaque: 3
+    - _ZTestGBuffer: 4
+    - _ZTestTransparent: 4
+    - _ZWrite: 1
+    - _ZWriteControl: 0
+    - _Z_Mask_Contrast: 1
+    - _Z_Mask_Intensity: 0.5
+    - __0_3: -0.3
+    - _metallic: 0
+    - _tvflicker_onoff: 20
+    - _tvflicker_onoff1: 10
+    - _tvflicker_onoff2: 0.9
+    m_Colors:
+    - _0_0_1: {r: 0, g: 0, b: 1, a: 0}
+    - _1_1: {r: 0, g: 0, b: 0, a: 0}
+    - _2: {r: 2, g: 0, b: 0, a: 0}
+    - _BaseColor_Value: {r: 0.81568635, g: 0.7843138, b: 0.75294125, a: 1}
+    - _CarPaint2_BRDFColorMapUVScale: {r: 1, g: 1, b: 0, a: 0}
+    - _CarPaint2_BTFFlakeMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _CarPaint2_CTCoeffs: {r: 1, g: 1, b: 1, a: 1}
+    - _CarPaint2_CTF0s: {r: 1, g: 1, b: 1, a: 1}
+    - _CarPaint2_CTSpreads: {r: 1, g: 1, b: 1, a: 1}
+    - _ClearcoatNormalMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Dirt_Tint: {r: 0.39607847, g: 0.37254903, b: 0.34901962, a: 1}
+    - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
+    - _Edges_Tint: {r: 0.5529412, g: 0.5529412, b: 0.5529412, a: 1}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissiveColor: {r: 0, g: 0, b: 0, a: 0}
+    - _Input_Underlaying_Normal_Map: {r: 0, g: 0, b: 1, a: 0}
+    - _MappingMask: {r: 1, g: 0, b: 0, a: 0}
+    - _Material_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _MossOffset: {r: 3, g: 1, b: 1, a: 0}
+    - _Moss_Direction: {r: 0, g: 0, b: 0, a: 0}
+    - _Rock01_Normal_Flatness: {r: 0, g: 0, b: 0, a: 0}
+    - _Rock01_Tint: {r: 1, g: 1, b: 1, a: 1}
+    - _SVBRDF_AlphaMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_AnisoRotationMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_ClearcoatColorMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_ClearcoatIORMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_DiffuseColorMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_FresnelMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_HeightMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_NormalMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_SpecularColorMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _SVBRDF_SpecularLobeMap_SO: {r: 1, g: 1, b: 0, a: 0}
+    - _Tint: {r: 0.7411765, g: 0.7411765, b: 0.7411765, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
