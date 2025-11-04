@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 839bdc3011e43e34683d62152d2a10dc
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Shaders/Advanced Grass Standard.shader
+  uploadId: 736889

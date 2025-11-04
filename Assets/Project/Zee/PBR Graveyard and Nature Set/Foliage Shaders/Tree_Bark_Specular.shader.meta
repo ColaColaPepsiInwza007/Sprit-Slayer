@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2afa0cac99508c340a7bb00454296749
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Shaders/Tree_Bark_Specular.shader
+  uploadId: 736889

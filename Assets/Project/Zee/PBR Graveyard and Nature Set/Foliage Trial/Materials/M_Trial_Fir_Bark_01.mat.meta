@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f5e64edee3ed13745a1cc2025696fe65
+timeCreated: 1512123522
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Trial/Materials/M_Trial_Fir_Bark_01.mat
+  uploadId: 736889

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 41a44dc6f4c76bf429bfb60cfaadc25e
+timeCreated: 1526285641
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Shaders/NMWindNoShiver.cginc
+  uploadId: 736889

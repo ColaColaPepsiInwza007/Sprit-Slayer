@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a1c955eddea1e0f4e9c4673c479e80dc
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Shaders/Tree_Leaves_Specular.shader
+  uploadId: 736889

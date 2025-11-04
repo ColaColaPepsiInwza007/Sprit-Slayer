@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 63669f5423b0bea4e8768b53b69f652d
+timeCreated: 1512124948
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/Foliage Trial/prefab_Trial_Fir_01_Plant.prefab
+  uploadId: 736889
