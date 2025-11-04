@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 22c16872cd6a5df4f801dd3f7ba96899
+timeCreated: 1469000517
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/PBR Graveyard/Trees/Models/Materials/M_deadtree_bark.mat
+  uploadId: 736889
