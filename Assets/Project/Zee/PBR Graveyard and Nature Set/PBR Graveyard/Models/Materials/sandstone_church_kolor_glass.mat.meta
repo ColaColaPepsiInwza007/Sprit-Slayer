@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cf348e6180e9a9e48842cc104d817309
+timeCreated: 1491310281
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/PBR Graveyard/Models/Materials/sandstone_church_kolor_glass.mat
+  uploadId: 736889
