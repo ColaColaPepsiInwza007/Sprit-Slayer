@@ -13,17 +13,36 @@ public class BossMovement : MonoBehaviour
 
     private void Update()
     {
+        // (*** โค้ดที่แก้ไข: เรียก HandleRotation ทุกเฟรม ***)
+        HandleRotation(Time.deltaTime); 
+        
         // ทำ Movement เฉพาะ State Chase เท่านั้น
         if (manager.currentState == BossManager.BossState.Chase)
         {
-            HandleTacticalChase(Time.deltaTime); // <--- เรียกใช้ฟังก์ชัน Tactical Chase
-        }
-        else if (manager.currentState == BossManager.BossState.Attack)
-        {
-            // หยุด Movement เมื่อโจมตี
+            HandleTacticalChase(Time.deltaTime);
         }
         
         HandleGravity();
+    }
+    
+    // *** ฟังก์ชันใหม่: จัดการการหันหน้าหา Player ตลอดเวลา (แม้ตอนโจมตี) ***
+    public void HandleRotation(float delta)
+    {
+        // Boss ควรหันหน้าหา Player เสมอ ยกเว้นตอนตาย
+        if (manager.playerTarget == null || manager.currentState == BossManager.BossState.Dead) return;
+
+        // หันหน้าตลอดเวลาใน State Chase และ Attack
+        if (manager.currentState == BossManager.BossState.Chase || 
+            manager.currentState == BossManager.BossState.Attack)
+        {
+            Vector3 targetDirection = manager.playerTarget.position - transform.position;
+            targetDirection.y = 0;
+            
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection.normalized);
+            
+            // ใช้ความเร็วในการหันเต็มที่
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, manager.rotationSpeed * delta);
+        }
     }
     
     public void HandleGravity()
@@ -46,10 +65,6 @@ public class BossMovement : MonoBehaviour
         
         float distanceToTarget = targetDirection.magnitude;
         
-        // 1. หันหน้าเข้าหา Player เสมอ
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection.normalized);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, manager.rotationSpeed * delta);
-        
         // 2. ถ้าถึงระยะโจมตี ให้โจมตีทันที
         if (distanceToTarget <= manager.stoppingDistance)
         {
@@ -65,7 +80,7 @@ public class BossMovement : MonoBehaviour
         Vector3 directionToPlayer = targetDirection.normalized;
         float dotProduct = Vector3.Dot(transform.right, directionToPlayer);
         
-        // ถ้า Player อยู่ในองศาที่เอียง (Abs(dotProduct) > 0.3) และยังไม่ประชิด (ยังไม่ถึง stoppingDistance)
+        // ถ้า Player อยู่ในองศาที่เอียง (Abs(dotProduct) > 0.3) และยังไม่ประชิด
         if (Mathf.Abs(dotProduct) > 0.3f && distanceToTarget > manager.stoppingDistance) 
         {
             // Boss เดินสวนทาง (Strafe) พร้อมกับเดินเข้าหา

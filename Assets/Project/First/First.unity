@@ -961,7 +961,7 @@ Transform:
   m_GameObject: {fileID: 426975204}
   serializedVersion: 2
   m_LocalRotation: {x: 0.6999591, y: -0.17485416, z: -0.06683345, w: 0.68921447}
-  m_LocalPosition: {x: -0.105075315, y: 0.21618024, z: 0.053750068}
+  m_LocalPosition: {x: -0.036, y: 0.233, z: 0.064}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2021,6 +2021,73 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &787000278
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 787000280}
+  - component: {fileID: 787000279}
+  - component: {fileID: 787000281}
+  m_Layer: 0
+  m_Name: Boss_Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &787000279
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787000278}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.39, y: 0.27, z: 0.85}
+  m_Center: {x: 0.02, y: 0, z: -0.49}
+--- !u!4 &787000280
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787000278}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.6625588, y: 0.2471273, z: -0.69383335, w: 0.1361595}
+  m_LocalPosition: {x: -0.017, y: 0.102, z: 0.021}
+  m_LocalScale: {x: 0.9500569, y: 0.95005697, z: 1.6468287}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7350119535361547682}
+  m_LocalEulerAnglesHint: {x: 8.772, y: 0, z: 0}
+--- !u!114 &787000281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787000278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0532c997af364ea40a0abf8f1c5d29f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossDamageDealer
+  attackDamage: 20
 --- !u!1 &798796849
 GameObject:
   m_ObjectHideFlags: 0
@@ -13540,6 +13607,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 426975205}
+  - {fileID: 787000280}
   - {fileID: 5791645435033691397}
   - {fileID: 6245305669937047512}
   - {fileID: 2845997262606034244}
@@ -14030,12 +14098,12 @@ MonoBehaviour:
   controller: {fileID: 7598764093015442166}
   playerTarget: {fileID: 852477753}
   bossAnim: {fileID: 7598764093015442167}
-  movementSpeed: 2
+  movementSpeed: 3
   rotationSpeed: 2
   stoppingDistance: 2.5
   strafeSpeed: 2.5
   baitingDistance: 6
-  attackCooldown: 1.5
+  attackCooldown: 1
 --- !u!143 &7598764093015442166
 CharacterController:
   m_ObjectHideFlags: 0
@@ -14073,6 +14141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9233fd7efb51cb340a8604f5b7d658b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimator
+  animationSpeedMultiplier: 1
 --- !u!114 &7598764093015442168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14085,6 +14154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5989d80e2c2c97a42abd95ce1a30be3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimationEvents
+  damageDealer: {fileID: 787000281}
 --- !u!137 &7603786707327388367
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

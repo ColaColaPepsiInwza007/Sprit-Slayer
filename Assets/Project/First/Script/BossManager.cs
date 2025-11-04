@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(BossAnimationEvents))] 
 public class BossManager : MonoBehaviour
 {
-    // === ENUM: สถานะของ Boss ===
+    // === ENUM: สถานะของ Boss (ลบ Baiting) ===
     public enum BossState
     {
         Idle,
@@ -29,9 +29,9 @@ public class BossManager : MonoBehaviour
     public float rotationSpeed = 10.0f;
     public float stoppingDistance = 1.5f; 
 
-    [Header("Tactical Movement")] // <--- ตัวแปรสำหรับ Logic การตอบโต้
-    [SerializeField] public float strafeSpeed = 4.5f;        // ความเร็วในการเดินสวนทาง
-    [SerializeField] public float baitingDistance = 6.0f;   // ระยะที่ Boss จะพิจารณาเดินวน/เอียง
+    [Header("Tactical Movement")] // ตัวแปรที่ยังอาจใช้ใน BossMovement
+    [SerializeField] public float strafeSpeed = 4.5f;        
+    [SerializeField] public float baitingDistance = 6.0f;   
 
     [Header("Attack Settings")]
     public float attackCooldown = 0.5f;
@@ -65,7 +65,7 @@ public class BossManager : MonoBehaviour
                 break;
 
             case BossState.Attack:
-                // หยุดแอนิเมชันเดินทันที และรอให้ Animation Event สั่งเปลี่ยน State กลับ
+                // BossManager สั่งหยุดแอนิเมชันเดินเท่านั้น การหันจะถูกจัดการใน BossMovement
                 if (bossAnim != null) bossAnim.UpdateMovement(0f); 
                 
                 if (playerTarget == null) 
