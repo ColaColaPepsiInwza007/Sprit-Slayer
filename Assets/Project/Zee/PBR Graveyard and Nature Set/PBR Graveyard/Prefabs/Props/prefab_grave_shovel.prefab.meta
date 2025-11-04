@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a72dd67355d54424abc06b33a94a9922
+timeCreated: 1492068558
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 58915
+  packageName: PBR Graveyard and Nature Set 2.0
+  packageVersion: 3.7.7
+  assetPath: Assets/NatureManufacture Assets/PBR Graveyard/Prefabs/Props/prefab_grave_shovel.prefab
+  uploadId: 736889
