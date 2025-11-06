@@ -961,8 +961,8 @@ Transform:
   m_GameObject: {fileID: 426975204}
   serializedVersion: 2
   m_LocalRotation: {x: 0.6999591, y: -0.17485416, z: -0.06683345, w: 0.68921447}
-  m_LocalPosition: {x: -0.036, y: 0.233, z: 0.064}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.025, y: 0.265, z: 0.065}
+  m_LocalScale: {x: 1.4101, y: 1.4101, z: 1.4101}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1659152877}
@@ -2068,13 +2068,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 787000278}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6625588, y: 0.2471273, z: -0.69383335, w: 0.1361595}
-  m_LocalPosition: {x: -0.017, y: 0.102, z: 0.021}
-  m_LocalScale: {x: 0.9500569, y: 0.95005697, z: 1.6468287}
+  m_LocalRotation: {x: -0.68322283, y: 0.2428998, z: -0.6734948, w: 0.14356521}
+  m_LocalPosition: {x: -0.006, y: 0.149, z: 0.056}
+  m_LocalScale: {x: 0.6777969, y: 1.0038302, z: 2.3638432}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7350119535361547682}
-  m_LocalEulerAnglesHint: {x: 8.772, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 7.528, y: 92.983, z: -148.004}
 --- !u!114 &787000281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3945,7 +3945,7 @@ Transform:
   m_GameObject: {fileID: 1659152876}
   serializedVersion: 2
   m_LocalRotation: {x: 0.24576, y: 0.88643223, z: 0.37888607, w: 0.101416856}
-  m_LocalPosition: {x: -0.51316154, y: 0.12784395, z: -0.03456852}
+  m_LocalPosition: {x: -0.474, y: 0.194, z: -0.056}
   m_LocalScale: {x: 0.65292823, y: 0.6529275, z: 0.6529281}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10027,7 +10027,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.99517304, z: -0, w: 0.09813606}
   m_LocalPosition: {x: 302.91, y: 2.588, z: 844.55}
-  m_LocalScale: {x: 0.28659308, y: 0.28659308, z: 0.28659308}
+  m_LocalScale: {x: 0.31362662, y: 0.31362662, z: 0.31362662}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4988728340988794262}
@@ -14098,12 +14098,16 @@ MonoBehaviour:
   controller: {fileID: 7598764093015442166}
   playerTarget: {fileID: 852477753}
   bossAnim: {fileID: 7598764093015442167}
-  movementSpeed: 3
+  movementSpeed: 3.8
   rotationSpeed: 2
-  stoppingDistance: 2.5
+  stoppingDistance: 3
   strafeSpeed: 2.5
   baitingDistance: 6
-  attackCooldown: 1
+  attackCooldown: 1.5
+  maxComboCount: 3
+  currentComboIndex: 0
+  comboResetTime: 1.5
+  comboBufferTime: 0.6
 --- !u!143 &7598764093015442166
 CharacterController:
   m_ObjectHideFlags: 0

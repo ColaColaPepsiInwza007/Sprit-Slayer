@@ -5,7 +5,6 @@ public class BossAnimationEvents : MonoBehaviour
     private BossManager manager;
 
     [Header("Damage Dealer Reference")]
-    // ต้องลาก BossDamageDealer Component (ที่อยู่บน Hitbox/Weapon) มาใส่ใน Inspector
     public BossDamageDealer damageDealer; 
 
     private void Awake()
@@ -13,38 +12,50 @@ public class BossAnimationEvents : MonoBehaviour
         manager = GetComponent<BossManager>();
     }
 
-    // --- ฟังก์ชันควบคุมจังหวะ State ---
+public void AnimationAttackFinished()
+{
+    Debug.Log("🟢 AnimationAttackFinished() called from Animation Event");
 
-    public void AnimationAttackFinished()
+    // ❗ ไม่ต้องเช็ก currentState == Attack อีกต่อไป
+    manager.currentComboIndex = 0;
+    manager.ResetComboTimers();
+
+    if (manager.bossAnim != null && manager.bossAnim.animator != null)
     {
-        if (manager.currentState == BossManager.BossState.Attack)
-        {
-            manager.currentState = BossManager.BossState.Chase;
-            Debug.Log("Boss: Attack Finished (Event Fired), Back to CHASE.");
-        }
+        manager.bossAnim.animator.ResetTrigger("Attack1");
+        manager.bossAnim.animator.ResetTrigger("Attack2");
+        manager.bossAnim.animator.ResetTrigger("Attack3");
+
+        // ส่ง Trigger ออกจากคอมโบ
+        manager.bossAnim.animator.SetTrigger("ComboExit");
+        Debug.Log("🟢 ComboExit trigger sent to Animator");
     }
 
-    // --- ฟังก์ชันควบคุม Hitbox/Damage ---
+    // ให้กลับไปไล่ผู้เล่นต่อ
+    manager.currentState = BossManager.BossState.Chase;
+    Debug.Log("🟢 Boss: Combo ended — back to CHASE state.");
+}
 
-    /// <summary>
-    /// ฟังก์ชันนี้ถูกเรียกโดย Animation Event เมื่อ Hitbox ควรจะทำงาน
-    /// </summary>
+    public void AnimationComboCheck()
+    {
+        manager.CheckForNextCombo();
+    }
+    
     public void EnableAttackDamage()
     {
         if (damageDealer != null) 
         {
             damageDealer.EnableDamageCollider();
+            Debug.Log("Boss Damage: Hitbox ENABLED.");
         }
     }
 
-    /// <summary>
-    /// ฟังก์ชันนี้ถูกเรียกโดย Animation Event เมื่อ Hitbox ควรจะหยุดทำงาน
-    /// </summary>
     public void DisableAttackDamage()
     {
         if (damageDealer != null) 
         {
             damageDealer.DisableDamageCollider();
+            Debug.Log("Boss Damage: Hitbox DISABLED.");
         }
     }
 }
