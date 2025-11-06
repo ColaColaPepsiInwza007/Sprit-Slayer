@@ -14106,10 +14106,10 @@ MonoBehaviour:
   phase3HealthThreshold: 250
   movementSpeed: 3.8
   rotationSpeed: 2
-  stoppingDistance: 3
-  strafeSpeed: 2.5
-  baitingDistance: 6
-  attackCooldown: 1.5
+  stoppingDistance: 1.8
+  strafeSpeed: 3
+  baitingDistance: 7.5
+  attackCooldown: 1.3
   maxComboCount: 3
   currentComboIndex: 0
   comboResetTime: 1.5
@@ -14151,7 +14151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9233fd7efb51cb340a8604f5b7d658b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimator
-  animator: {fileID: 0}
+  animator: {fileID: 7598764093015442163}
   animationSpeedMultiplier: 1
 --- !u!114 &7598764093015442168
 MonoBehaviour:
@@ -14178,14 +14178,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 953449d96d47fe04c979e2752c816c18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAI
-  thinkIntervalMin: 0.3
-  thinkIntervalMax: 0.6
-  detectRange: 10
-  attackRange: 2.5
+  thinkIntervalMin: 0.19
+  thinkIntervalMax: 0.3
+  detectRange: 12
+  attackRange: 3.8
   singleAttackChance: 0.5
   comboAttackChance: 0.3
   strafeChance: 0.2
-  strafeDuration: 1.5
+  strafeDuration: 1.8
 --- !u!137 &7603786707327388367
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
