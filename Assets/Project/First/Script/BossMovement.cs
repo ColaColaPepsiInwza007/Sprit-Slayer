@@ -11,32 +11,32 @@ public class BossMovement : MonoBehaviour
         manager = GetComponent<BossManager>();
     }
 
-    private void Update()
-    {
-        HandleRotation(Time.deltaTime); 
-        
-        if (manager.currentState == BossManager.BossState.Chase)
-        {
-            HandleTacticalChase(Time.deltaTime);
-        }
-        
-        HandleGravity();
+private void Update()
+{
+    HandleRotation(Time.deltaTime);
 
-        // Logic บังคับ Animation เดิน (Force Play Fix)
-        if (manager.currentState == BossManager.BossState.Chase)
+    // 🚫 ถ้าไม่อยู่ในสถานะ Chase ให้หยุดทั้งหมด (กันชน AI อื่น)
+    if (manager.currentState != BossManager.BossState.Chase)
+        return;
+
+    // ✅ เฉพาะตอน Chase เท่านั้นที่ให้เดิน
+    HandleTacticalChase(Time.deltaTime);
+    HandleGravity();
+
+    // ✅ Logic เดินแอนิเมชัน (เฉพาะตอน Chase)
+    if (manager.bossAnim != null && manager.bossAnim.animator != null)
+    {
+        float targetMoveAmount = (manager.playerTarget != null) ? 1f : 0f;
+
+        if (targetMoveAmount > 0.1f &&
+            manager.bossAnim.animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
         {
-            if (manager.bossAnim != null && manager.bossAnim.animator != null)
-            {
-                float targetMoveAmount = (manager.playerTarget != null) ? 1f : 0f;
-                
-                if (targetMoveAmount > 0.1f && manager.bossAnim.animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
-                {
-                    manager.bossAnim.animator.Play("Walk", 0); 
-                    Debug.Log("Forced Animator Play: JUMP to Walk State.");
-                }
-            }
+            manager.bossAnim.animator.Play("Walk", 0);
+            Debug.Log("Forced Animator Play: JUMP to Walk State.");
         }
     }
+}
+
     
     // จัดการการหันหน้าหา Player ตลอดเวลา (รวมถึงตอนโจมตี)
     public void HandleRotation(float delta)

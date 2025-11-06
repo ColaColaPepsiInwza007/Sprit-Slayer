@@ -9046,6 +9046,7 @@ GameObject:
   - component: {fileID: 7598764093015442164}
   - component: {fileID: 7598764093015442168}
   - component: {fileID: 7598764093015442167}
+  - component: {fileID: 7598764093015442169}
   m_Layer: 7
   m_Name: Boss_T_Poseblend
   m_TagString: Enemy
@@ -14095,9 +14096,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossManager
   currentState: 1
+  currentPhase: 0
   controller: {fileID: 7598764093015442166}
   playerTarget: {fileID: 852477753}
   bossAnim: {fileID: 7598764093015442167}
+  maxHealth: 1000
+  currentHealth: 0
+  phase2HealthThreshold: 500
+  phase3HealthThreshold: 250
   movementSpeed: 3.8
   rotationSpeed: 2
   stoppingDistance: 3
@@ -14145,6 +14151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9233fd7efb51cb340a8604f5b7d658b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimator
+  animator: {fileID: 0}
   animationSpeedMultiplier: 1
 --- !u!114 &7598764093015442168
 MonoBehaviour:
@@ -14159,6 +14166,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimationEvents
   damageDealer: {fileID: 787000281}
+--- !u!114 &7598764093015442169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3809983535471673907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 953449d96d47fe04c979e2752c816c18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossAI
+  thinkIntervalMin: 0.3
+  thinkIntervalMax: 0.6
+  detectRange: 10
+  attackRange: 2.5
+  singleAttackChance: 0.5
+  comboAttackChance: 0.3
+  strafeChance: 0.2
+  strafeDuration: 1.5
 --- !u!137 &7603786707327388367
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

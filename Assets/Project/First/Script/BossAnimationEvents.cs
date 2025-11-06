@@ -52,10 +52,33 @@ public void AnimationAttackFinished()
 
     public void DisableAttackDamage()
     {
-        if (damageDealer != null) 
+        if (damageDealer != null)
         {
             damageDealer.DisableDamageCollider();
             Debug.Log("Boss Damage: Hitbox DISABLED.");
         }
     }
+    public void AnimationAttackEndIfSingle()
+{
+    // 🔹 ถ้าคอมโบมีแค่ 1 hit ให้จบเลย
+    if (manager.maxComboCount == 1)
+    {
+        Debug.Log("Boss: Single attack finished — returning to Chase.");
+        manager.currentComboIndex = 0;
+        manager.ResetComboTimers();
+
+        if (manager.bossAnim != null && manager.bossAnim.animator != null)
+        {
+            manager.bossAnim.animator.SetTrigger("ComboExit");
+        }
+
+        manager.currentState = BossManager.BossState.Chase;
+    }
+    else
+    {
+        // 🔸 ถ้ามีมากกว่า 1 hit ไม่ต้องทำอะไร ให้ต่อคอมโบได้
+        Debug.Log("Boss: Combo continues — not exiting yet.");
+    }
+}
+
 }

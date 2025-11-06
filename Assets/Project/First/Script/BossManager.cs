@@ -46,10 +46,9 @@ public class BossManager : MonoBehaviour
     [SerializeField] public float baitingDistance = 6.0f;   
 
     [Header("Attack Settings")]
-    public float attackCooldown = 0.5f;
+    public float attackCooldown = 1.0f; // ⏱️ เย็นตัวหลังโจมตี
     private float attackTimer;
 
-    // (*** โค้ดสำหรับ Combo ***)
     [Header("Combo Settings")]
     public int maxComboCount = 3;
     public int currentComboIndex = 0; 
@@ -77,22 +76,23 @@ public class BossManager : MonoBehaviour
         HandlePhaseTransition();
         HandleBossState();
 
-        // Logic Combo Timer
+        // Combo timer
         if (comboTimer > 0)
         {
             comboTimer -= Time.deltaTime;
             if (comboTimer <= 0)
             {
-                currentComboIndex = 0; 
-                continueComboTimer = 0f; 
+                currentComboIndex = 0;
+                continueComboTimer = 0f;
+
                 if (currentState == BossState.Attack)
                 {
                     currentState = BossState.Chase;
                 }
             }
         }
-        
-        // Logic Continuation Timer
+
+        // Combo continuation buffer
         if (continueComboTimer > 0)
         {
             continueComboTimer -= Time.deltaTime;
@@ -101,6 +101,10 @@ public class BossManager : MonoBehaviour
                 DecideAndExecuteAttack(); 
             }
         }
+
+        // Cooldown timer
+        if (attackTimer > 0)
+            attackTimer -= Time.deltaTime;
     }
     
     private void HandlePhaseTransition()
@@ -122,100 +126,92 @@ public class BossManager : MonoBehaviour
         switch (currentState)
         {
             case BossState.Chase:
-                float moveAmount = (playerTarget != null) ? 1f : 0f;
-                
                 if (bossAnim != null)
                 {
-                    // ต้องลบ ResetTrigger ออกจาก Loop เพื่อไม่ให้ Animation ค้าง
-                    bossAnim.UpdateMovement(moveAmount); 
+                    bossAnim.UpdateMovement(1f);
                 }
                 break;
 
             case BossState.Attack:
-                if (bossAnim != null) bossAnim.UpdateMovement(0f); 
-                
-                if (playerTarget == null) 
+                if (bossAnim != null) bossAnim.UpdateMovement(0f);
+
+                if (playerTarget == null)
                 {
-                    currentState = BossState.Chase; 
+                    currentState = BossState.Chase;
                     return;
                 }
-                
-                if (attackTimer > 0)
+
+                // 🔹 ถ้าอยู่ไกลเกิน ให้กลับไป Chase
+                float dist = Vector3.Distance(transform.position, playerTarget.position);
+                if (dist > stoppingDistance + 0.75f)
                 {
-                    attackTimer -= Time.deltaTime;
+                    currentState = BossState.Chase;
+                    bossAnim.UpdateMovement(1f);
                 }
                 break;
-                
+
             case BossState.Idle:
                 if (bossAnim != null) bossAnim.UpdateMovement(0f);
                 break;
         }
     }
 
-    public void RequestAttack()
-    {
-        if (currentComboIndex == 0 && attackTimer > 0) 
-        {
-            Debug.Log("DEBUG: Attack Blocked (Cooldown).");
-            return;
-        }
-        
-        if (currentState == BossState.Attack)
-        {
-             Debug.Log("DEBUG: Attack Blocked (Already Attacking).");
-             return;
-        }
-        
-        Debug.Log("Boss: Requesting Attack. State set to ATTACK.");
-        
-        currentState = BossState.Attack;
-        DecideAndExecuteAttack();
-    }
+public void RequestAttack()
+{
+    if (attackTimer > 0) return;
+    if (currentState == BossState.Attack) return;
+
+    currentState = BossState.Attack;
+
+    // สุ่มว่าจะคอมโบหรือไม่ (ให้ AI มีผล)
+    DecideAndExecuteAttack();
+}
 
     private void DecideAndExecuteAttack()
     {
         continueComboTimer = 0f; 
         int nextAttackIndex = 0;
 
-        if (currentComboIndex == 0) 
+        if (currentComboIndex == 0)
         {
             if (currentPhase == BossPhase.Phase1)
             {
-                 nextAttackIndex = 1; 
-                 maxComboCount = 3;
+                nextAttackIndex = 1;
+                maxComboCount = 3;
             }
-            else // Phase 2/3 Logic
+            else
             {
                 int randomChance = Random.Range(1, 101);
-                if (randomChance > 60) 
+                if (randomChance > 60)
                 {
-                    nextAttackIndex = 4; 
-                    maxComboCount = 1; 
+                    nextAttackIndex = 4;
+                    maxComboCount = 1;
                 }
                 else
                 {
-                    nextAttackIndex = 1; 
+                    nextAttackIndex = 1;
                     maxComboCount = 3;
                 }
             }
             currentComboIndex = nextAttackIndex;
         }
-        else 
+        else
         {
             currentComboIndex++;
             if (currentComboIndex > maxComboCount)
-            {
-                currentComboIndex = 1; 
-            }
+                currentComboIndex = 1;
+
             nextAttackIndex = currentComboIndex;
         }
-        
-        if (bossAnim != null) bossAnim.TriggerAttack(nextAttackIndex); 
-        
+
+        if (bossAnim != null)
+            bossAnim.TriggerAttack(nextAttackIndex);
+
         Debug.Log($"Boss: Trigger 'Attack' {nextAttackIndex} Fired! Phase: {currentPhase}");
-        
+
+        // ตั้งคูลดาวน์ใหม่
         attackTimer = attackCooldown;
-        comboTimer = comboResetTime; 
+        comboTimer = comboResetTime;
     }
 
     public void CheckForNextCombo()
@@ -233,10 +229,10 @@ public class BossManager : MonoBehaviour
             Debug.Log($"Combo Check: Starting {comboBufferTime}s buffer for next hit (Hit {currentComboIndex + 1})");
         }
     }
-    public void ResetComboTimers()
-{
-    comboTimer = 0f;
-    continueComboTimer = 0f;
-}
 
+    public void ResetComboTimers()
+    {
+        comboTimer = 0f;
+        continueComboTimer = 0f;
+    }
 }
