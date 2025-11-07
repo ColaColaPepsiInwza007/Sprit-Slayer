@@ -962,7 +962,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.6999591, y: -0.17485416, z: -0.06683345, w: 0.68921447}
   m_LocalPosition: {x: -0.025, y: 0.265, z: 0.065}
-  m_LocalScale: {x: 1.4101, y: 1.4101, z: 1.4101}
+  m_LocalScale: {x: 1.2852426, y: 1.2852426, z: 1.2852426}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1659152877}
@@ -2069,8 +2069,8 @@ Transform:
   m_GameObject: {fileID: 787000278}
   serializedVersion: 2
   m_LocalRotation: {x: -0.68322283, y: 0.2428998, z: -0.6734948, w: 0.14356521}
-  m_LocalPosition: {x: -0.006, y: 0.149, z: 0.056}
-  m_LocalScale: {x: 0.6777969, y: 1.0038302, z: 2.3638432}
+  m_LocalPosition: {x: -0.01, y: 0.14, z: 0.07}
+  m_LocalScale: {x: 0.6777969, y: 1.0038302, z: 2.0745032}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7350119535361547682}
@@ -10028,7 +10028,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.99517304, z: -0, w: 0.09813606}
   m_LocalPosition: {x: 302.91, y: 2.588, z: 844.55}
-  m_LocalScale: {x: 0.31362662, y: 0.31362662, z: 0.31362662}
+  m_LocalScale: {x: 0.32688427, y: 0.32688427, z: 0.32688427}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4988728340988794262}
@@ -14097,6 +14097,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossManager
   currentState: 1
   currentPhase: 0
+  isRecoveringFromAttack: 0
+  postAttackRecoveryTime: 1
+  recoveryTimer: 0
   controller: {fileID: 7598764093015442166}
   playerTarget: {fileID: 852477753}
   bossAnim: {fileID: 7598764093015442167}
@@ -14104,16 +14107,17 @@ MonoBehaviour:
   currentHealth: 0
   phase2HealthThreshold: 500
   phase3HealthThreshold: 250
-  movementSpeed: 3.8
+  movementSpeed: 3.2
   rotationSpeed: 2
-  stoppingDistance: 1.8
-  strafeSpeed: 3
-  baitingDistance: 7.5
+  stoppingDistance: 3
+  strafeSpeed: 4.5
+  baitingDistance: 7
   attackCooldown: 1.3
   maxComboCount: 3
   currentComboIndex: 0
   comboResetTime: 1.5
   comboBufferTime: 0.6
+  isPlayingAnimation: 0
 --- !u!143 &7598764093015442166
 CharacterController:
   m_ObjectHideFlags: 0
@@ -14166,6 +14170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimationEvents
   damageDealer: {fileID: 787000281}
+  isRecoveringFromAttack: 0
 --- !u!114 &7598764093015442169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14180,12 +14185,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossAI
   thinkIntervalMin: 0.19
   thinkIntervalMax: 0.3
-  detectRange: 12
-  attackRange: 3.8
-  singleAttackChance: 0.5
-  comboAttackChance: 0.3
-  strafeChance: 0.2
-  strafeDuration: 1.8
 --- !u!137 &7603786707327388367
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

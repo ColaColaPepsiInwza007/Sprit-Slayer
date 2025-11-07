@@ -3,8 +3,11 @@ using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(BossMovement))] 
-[RequireComponent(typeof(BossAnimator))] 
-[RequireComponent(typeof(BossAnimationEvents))] 
+[RequireComponent(typeof(BossAnimator))]
+[RequireComponent(typeof(BossAnimationEvents))]
+
+
+
 public class BossManager : MonoBehaviour
 {
     // === ENUM: สถานะของ Boss ===
@@ -20,8 +23,14 @@ public class BossManager : MonoBehaviour
     public enum BossPhase { Phase1, Phase2, Phase3 }
 
     [Header("State Control")]
-    public BossState currentState = BossState.Chase; 
-    public BossPhase currentPhase = BossPhase.Phase1; 
+    public BossState currentState = BossState.Chase;
+    public BossPhase currentPhase = BossPhase.Phase1;
+    // 🔹 ฟิลด์ใหม่สำหรับควบคุมช่วงฟื้นตัวหลังการโจมตี
+[Header("Attack Recovery Settings")]
+public bool isRecoveringFromAttack = false;  // 🔹 ตอนนี้บอสกำลังพักหลังโจมตีไหม
+public float postAttackRecoveryTime = 1.0f;  // 🔹 ระยะเวลาพักหลังโจมตี (เช่น 1 วิ)
+public float recoveryTimer = 0f;             // 🔹 ตัวนับเวลา cooldown หลังตี
+
 
     [Header("Core Components")]
     public CharacterController controller;
@@ -33,8 +42,9 @@ public class BossManager : MonoBehaviour
     public float currentHealth;
 
     [Header("Phase Transition Settings")]
-    [SerializeField] private float phase2HealthThreshold = 500f; 
+    [SerializeField] private float phase2HealthThreshold = 500f;
     [SerializeField] private float phase3HealthThreshold = 250f; 
+    
 
     [Header("Boss State")]
     public float movementSpeed = 4.0f; 
@@ -46,7 +56,7 @@ public class BossManager : MonoBehaviour
     [SerializeField] public float baitingDistance = 6.0f;   
 
     [Header("Attack Settings")]
-    public float attackCooldown = 1.0f; // ⏱️ เย็นตัวหลังโจมตี
+    public float attackCooldown = 1.0f; 
     private float attackTimer;
 
     [Header("Combo Settings")]
@@ -57,6 +67,9 @@ public class BossManager : MonoBehaviour
     
     [SerializeField] private float comboBufferTime = 0.15f; 
     private float continueComboTimer = 0f; 
+
+    // 🔹 เพิ่มสถานะเช็คว่ากำลังเล่น Animation อยู่ไหม
+    [HideInInspector] public bool isPlayingAnimation = false;
 
     private void Awake()
     {
@@ -105,6 +118,18 @@ public class BossManager : MonoBehaviour
         // Cooldown timer
         if (attackTimer > 0)
             attackTimer -= Time.deltaTime;
+        // ✅ Recovery Timer หลังโจมตี
+if (isRecoveringFromAttack)
+{
+    recoveryTimer -= Time.deltaTime;
+    if (recoveryTimer <= 0f)
+    {
+        isRecoveringFromAttack = false;
+        recoveryTimer = 0f;
+        Debug.Log("🟢 Boss recovery finished — can move again.");
+    }
+}
+
     }
     
     private void HandlePhaseTransition()
@@ -133,21 +158,8 @@ public class BossManager : MonoBehaviour
                 break;
 
             case BossState.Attack:
+                // 🔹 ขณะโจมตี: ไม่ขยับ ไม่อัปเดต movement
                 if (bossAnim != null) bossAnim.UpdateMovement(0f);
-
-                if (playerTarget == null)
-                {
-                    currentState = BossState.Chase;
-                    return;
-                }
-
-                // 🔹 ถ้าอยู่ไกลเกิน ให้กลับไป Chase
-                float dist = Vector3.Distance(transform.position, playerTarget.position);
-                if (dist > stoppingDistance + 0.75f)
-                {
-                    currentState = BossState.Chase;
-                    bossAnim.UpdateMovement(1f);
-                }
                 break;
 
             case BossState.Idle:
@@ -156,16 +168,19 @@ public class BossManager : MonoBehaviour
         }
     }
 
-public void RequestAttack()
-{
-    if (attackTimer > 0) return;
-    if (currentState == BossState.Attack) return;
+    public void RequestAttack()
+    {
+        if (attackTimer > 0) return;
+        if (currentState == BossState.Attack) return;
 
-    currentState = BossState.Attack;
+        currentState = BossState.Attack;
 
-    // สุ่มว่าจะคอมโบหรือไม่ (ให้ AI มีผล)
-    DecideAndExecuteAttack();
-}
+        // 🔹 เริ่มโจมตี → ตั้งสถานะว่ากำลังเล่น Animation
+        isPlayingAnimation = true;
+
+        DecideAndExecuteAttack();
+    }
+    
 
     private void DecideAndExecuteAttack()
     {
@@ -234,5 +249,19 @@ public void RequestAttack()
     {
         comboTimer = 0f;
         continueComboTimer = 0f;
+    }
+
+    // 🔹 ฟังก์ชันที่จะถูกเรียกจาก Animation Event
+    public void AnimationAttackStart()
+    {
+        isPlayingAnimation = true;
+        Debug.Log("Boss animation start → Lock movement/strafe");
+    }
+
+    public void AnimationAttackEnd()
+    {
+        isPlayingAnimation = false;
+        currentState = BossState.Chase; // กลับไปไล่ล่าตามปกติ
+        Debug.Log("Boss animation end → Unlock movement/strafe");
     }
 }

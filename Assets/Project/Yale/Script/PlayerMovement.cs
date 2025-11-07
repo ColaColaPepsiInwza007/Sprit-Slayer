@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem; // ✅ สำหรับระบบ Input System ใหม่
+
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -20,8 +22,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Stamina Settings")]
     [SerializeField] private float staminaDepleteRate = 15f; 
     [SerializeField] private float staminaRegenRate = 20f;   
-    [SerializeField] private float staminaRegenDelay = 1.5f; 
-    private float timeSinceLastSprint = 0f; 
+    [SerializeField] private float staminaRegenDelay = 1.5f;
+    private float timeSinceLastSprint = 0f;
+    public Vector2 MoveInput { get; private set; }
 
     private void Awake()
     {
@@ -152,4 +155,24 @@ public class PlayerMovement : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * delta);
     }
+    // 🔹 อ่านปุ่มเคลื่อนไหวของผู้เล่น (ใช้ใน BossMovement)
+private void LateUpdate()
+{
+    float horizontal = 0f;
+    float vertical = 0f;
+
+    // ✅ ใช้ระบบ Input System ใหม่ (Keyboard)
+    if (Keyboard.current != null)
+    {
+        if (Keyboard.current.aKey.isPressed) horizontal = -1f;
+        else if (Keyboard.current.dKey.isPressed) horizontal = 1f;
+
+        if (Keyboard.current.wKey.isPressed) vertical = 1f;
+        else if (Keyboard.current.sKey.isPressed) vertical = -1f;
+    }
+
+    MoveInput = new Vector2(horizontal, vertical);
+}
+
+
 }
