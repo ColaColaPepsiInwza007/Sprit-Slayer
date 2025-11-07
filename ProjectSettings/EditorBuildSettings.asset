@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Project/Zee/Scene 1/Main/Graveyard_Demo.unity
+    guid: 5b99475805b1d1148b2e6ecb5fdeacd2
+  - enabled: 1
+    path: Assets/Project/Zee/Scene 1/Puzzle/_Recovery/0.unity
+    guid: 22bc0fbc6d0100147b69e5e164edd6e8
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: b02eb8a766043bc42b265fd9b2e3669b, type: 3}
   m_UseUCBPForAssetBundles: 0
