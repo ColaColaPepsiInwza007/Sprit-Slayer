@@ -35,9 +35,14 @@ public void AnimationAttackFinished()
     // 🔹 เพิ่มบรรทัดนี้: เข้าสู่โหมด recovery
     manager.isRecoveringFromAttack = true;
 
+    // ❗️❗️❗️ บรรทัดที่ต้องเพิ่มอยู่ตรงนี้ ❗️❗️❗️
+    // ------------------------------------------------------------------
+    manager.isPlayingAnimation = false; 
+    Debug.Log("🟢 Boss: Combo ended — setting isPlayingAnimation to FALSE.");
+    // ------------------------------------------------------------------
+
     Debug.Log("🟢 Boss: Combo ended — entering Tactical Recovery.");
 }
-
 
     public void AnimationComboCheck()
     {
@@ -90,20 +95,40 @@ public void AnimationAttackStart()
     Debug.Log("Boss Animation Start → movement locked.");
 }
 
-public void AnimationAttackEnd()
-{
-    if (manager == null) manager = GetComponent<BossManager>();
+    public void AnimationAttackEnd()
+    {
+        if (manager == null) manager = GetComponent<BossManager>();
 
-    manager.isPlayingAnimation = false;
+        // ✅ 1. ปลดล็อคสถานะการเล่น Animation
+        manager.isPlayingAnimation = false;
 
-    // ✅ เริ่มช่วงฟื้นตัวหลังคอมโบ
-    manager.isRecoveringFromAttack = true;
-    manager.recoveryTimer = manager.postAttackRecoveryTime;
+        // ✅ 2. รีเซ็ตคอมโบ (เผื่อเป็นท่าสุดท้าย)
+        manager.currentComboIndex = 0;
+        manager.ResetComboTimers();
 
-    Debug.Log("Boss Animation End → recovery phase started.");
-}
+        // ✅ 3. สั่ง Animator ให้กลับ Idle
+        if (manager.bossAnim != null && manager.bossAnim.animator != null)
+        {
+            manager.bossAnim.animator.SetTrigger("ComboExit");
+        }
 
+        // ✅ 4. ❗️❗️❗️ เปลี่ยน: เข้าสู่สถานะ Recovery ❗️❗️❗️
+        // (BossManager.cs จะเปลี่ยนกลับเป็น Chase ให้อัตโนมัติหลัง postAttackRecoveryTime)
+        manager.isRecoveringFromAttack = true;
+        manager.recoveryTimer = manager.postAttackRecoveryTime; // ❗️ เริ่มนับถอยหลัง
+        manager.currentState = BossManager.BossState.Idle; // ❗️ เปลี่ยน: ให้เป็น Idle ชั่วคราว
 
-
+        Debug.Log("Boss Animation End → Entering Recovery state.");
+    }
+// 🟢 ให้เรียกจาก Event ได้ เพื่อ reset
+    public void ResetStrafeState()
+    {
+        var move = manager.GetComponent<BossMovement>();
+        if (move != null)
+        {
+            // (เรายังไม่มีฟังก์ชันนี้ใน BossMovement แต่เพิ่มไว้ก่อนได้)
+            // move.ResetStrafeState(); 
+        }
+    }
 
 }

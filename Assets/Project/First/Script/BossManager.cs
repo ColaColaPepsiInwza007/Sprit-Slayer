@@ -2,86 +2,75 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(BossMovement))] 
+[RequireComponent(typeof(BossMovement))]
 [RequireComponent(typeof(BossAnimator))]
 [RequireComponent(typeof(BossAnimationEvents))]
-
-
-
 public class BossManager : MonoBehaviour
 {
-    // === ENUM: สถานะของ Boss ===
-    public enum BossState
-    {
-        Idle,
-        Chase,      
-        Attack,     
-        Stunned,
-        Dead
-    }
-
+    // ✅ เพิ่ม Bait และ Reposition
+    public enum BossState { Idle, Chase, Bait, Reposition, Attack, Stunned, Dead }
     public enum BossPhase { Phase1, Phase2, Phase3 }
 
     [Header("State Control")]
     public BossState currentState = BossState.Chase;
     public BossPhase currentPhase = BossPhase.Phase1;
-    // 🔹 ฟิลด์ใหม่สำหรับควบคุมช่วงฟื้นตัวหลังการโจมตี
-[Header("Attack Recovery Settings")]
-public bool isRecoveringFromAttack = false;  // 🔹 ตอนนี้บอสกำลังพักหลังโจมตีไหม
-public float postAttackRecoveryTime = 1.0f;  // 🔹 ระยะเวลาพักหลังโจมตี (เช่น 1 วิ)
-public float recoveryTimer = 0f;             // 🔹 ตัวนับเวลา cooldown หลังตี
-
 
     [Header("Core Components")]
     public CharacterController controller;
-    public Transform playerTarget; 
-    public BossAnimator bossAnim; 
+    public Transform playerTarget;
+    public BossAnimator bossAnim;
 
-    [Header("Boss Health")] 
+    [Header("Boss Health")]
     public float maxHealth = 1000f;
     public float currentHealth;
 
-    [Header("Phase Transition Settings")]
+    [Header("Phase Thresholds")]
     [SerializeField] private float phase2HealthThreshold = 500f;
-    [SerializeField] private float phase3HealthThreshold = 250f; 
+    [SerializeField] private float phase3HealthThreshold = 250f;
     
 
-    [Header("Boss State")]
-    public float movementSpeed = 4.0f; 
+    [Header("Movement Settings")]
+    public float movementSpeed = 4.0f;
     public float rotationSpeed = 10.0f;
-    public float stoppingDistance = 1.5f; 
-
-    [Header("Tactical Movement")] 
-    [SerializeField] public float strafeSpeed = 4.5f;        
-    [SerializeField] public float baitingDistance = 6.0f;   
+    public float stoppingDistance = 1.5f;
+    public float baitingDistance = 6.0f; // ✅ ตัวแปร Bait
+    public float strafeSpeed = 4.5f;     // ✅ ตัวแปร Bait
 
     [Header("Attack Settings")]
-    public float attackCooldown = 1.0f; 
+    public float attackCooldown = 1.0f;
     private float attackTimer;
 
     [Header("Combo Settings")]
     public int maxComboCount = 3;
-    public int currentComboIndex = 0; 
-    [SerializeField] private float comboResetTime = 1.0f; 
-    private float comboTimer; 
-    
-    [SerializeField] private float comboBufferTime = 0.15f; 
-    private float continueComboTimer = 0f; 
+    public int currentComboIndex = 0;
+    [SerializeField] private float comboResetTime = 1.0f;
+    private float comboTimer;
+    [SerializeField] private float comboBufferTime = 0.15f;
+    private float continueComboTimer = 0f;
+    [HideInInspector] public int lastAttackIndex = 0; // ✅ สำหรับสุ่มคอมโบ
 
-    // 🔹 เพิ่มสถานะเช็คว่ากำลังเล่น Animation อยู่ไหม
+    [Header("Recovery Settings")]
+    public float postAttackRecoveryTime = 0.8f;
+    public float recoveryTimer = 0f;
     [HideInInspector] public bool isPlayingAnimation = false;
+    [HideInInspector] public bool isRecoveringFromAttack = false;
+
+    [Header("Reposition Settings")] // ✅ เพิ่ม
+    public float repositionTime = 1.5f; // จะถอยนานแค่ไหน
+    [HideInInspector] public float repositionTimer = 0f;
+
+
+    [HideInInspector] public bool allowRootMotion = true;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        bossAnim = GetComponent<BossAnimator>(); 
+        bossAnim = GetComponent<BossAnimator>();
         currentHealth = maxHealth;
-        
+
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
-        {
             playerTarget = playerObj.transform;
-        }
     }
 
     private void Update()
@@ -89,7 +78,7 @@ public float recoveryTimer = 0f;             // 🔹 ตัวนับเวล
         HandlePhaseTransition();
         HandleBossState();
 
-        // Combo timer
+        // Combo timer logic
         if (comboTimer > 0)
         {
             comboTimer -= Time.deltaTime;
@@ -98,170 +87,188 @@ public float recoveryTimer = 0f;             // 🔹 ตัวนับเวล
                 currentComboIndex = 0;
                 continueComboTimer = 0f;
 
-                if (currentState == BossState.Attack)
-                {
-                    currentState = BossState.Chase;
-                }
+                if (currentState == BossManager.BossState.Attack)
+                    currentState = BossManager.BossState.Chase;
             }
         }
 
-        // Combo continuation buffer
+        // Combo continuation
         if (continueComboTimer > 0)
         {
             continueComboTimer -= Time.deltaTime;
             if (continueComboTimer <= 0)
+                DecideAndExecuteAttack();
+        }
+
+        // Cooldown
+        if (attackTimer > 0)
+            attackTimer -= Time.deltaTime;
+
+        // ✅ Recovery phase check (ที่อัปเดตแล้ว)
+        if (isRecoveringFromAttack)
+        {
+            recoveryTimer -= Time.deltaTime;
+            if (recoveryTimer <= 0)
             {
-                DecideAndExecuteAttack(); 
+                isRecoveringFromAttack = false;
+
+                // ❗️❗️❗️ Logic การตัดสินใจใหม่ (สุ่มถอย) ❗️❗️❗️
+                int randomChoice = Random.Range(0, 100);
+                if (randomChoice > 60) // 40% ที่จะถอย
+                {
+                    currentState = BossManager.BossState.Reposition;
+                    repositionTimer = repositionTime; // เริ่มจับเวลาถอย
+                    Debug.Log("Boss: Recovery finished, deciding to REPOSITION.");
+                }
+                else // 60% ที่จะไล่ต่อ
+                {
+                    currentState = BossManager.BossState.Chase;
+                    Debug.Log("Boss: Recovery finished, deciding to CHASE.");
+                }
             }
         }
 
-        // Cooldown timer
-        if (attackTimer > 0)
-            attackTimer -= Time.deltaTime;
-        // ✅ Recovery Timer หลังโจมตี
-if (isRecoveringFromAttack)
-{
-    recoveryTimer -= Time.deltaTime;
-    if (recoveryTimer <= 0f)
-    {
-        isRecoveringFromAttack = false;
-        recoveryTimer = 0f;
-        Debug.Log("🟢 Boss recovery finished — can move again.");
+        // ✅ Timer ของ Reposition
+        if (currentState == BossManager.BossState.Reposition)
+        {
+            repositionTimer -= Time.deltaTime;
+            if (repositionTimer <= 0)
+            {
+                currentState = BossManager.BossState.Chase; // ถอยเสร็จแล้ว ไล่ต่อ
+                Debug.Log("Boss: Reposition finished, resuming CHASE.");
+            }
+        }
     }
-}
 
-    }
-    
     private void HandlePhaseTransition()
     {
         if (currentPhase == BossPhase.Phase1 && currentHealth <= phase2HealthThreshold)
-        {
             currentPhase = BossPhase.Phase2;
-            Debug.Log("BOSS PHASE TRANSITIONED TO PHASE 2!");
-        }
         else if (currentPhase == BossPhase.Phase2 && currentHealth <= phase3HealthThreshold)
-        {
             currentPhase = BossPhase.Phase3;
-            Debug.Log("BOSS PHASE TRANSITIONED TO PHASE 3!");
-        }
     }
 
     private void HandleBossState()
     {
         switch (currentState)
         {
-            case BossState.Chase:
-                if (bossAnim != null)
-                {
-                    bossAnim.UpdateMovement(1f);
-                }
+            case BossManager.BossState.Chase:
+                bossAnim?.UpdateMovement(1f); // วิ่ง
                 break;
 
-            case BossState.Attack:
-                // 🔹 ขณะโจมตี: ไม่ขยับ ไม่อัปเดต movement
-                if (bossAnim != null) bossAnim.UpdateMovement(0f);
+            case BossManager.BossState.Bait:
+                // (ปล่อยให้ BossMovement สั่งแอนิเมชั่น)
+                break;
+            
+            case BossManager.BossState.Reposition: // ✅ เพิ่ม
+                bossAnim?.UpdateMovement(-1f); // ❗️ ใช้แอนิเมชั่นเดินถอยหลัง
                 break;
 
-            case BossState.Idle:
-                if (bossAnim != null) bossAnim.UpdateMovement(0f);
+            case BossManager.BossState.Attack:
+                bossAnim?.UpdateMovement(0f);
+                break;
+
+            case BossManager.BossState.Idle:
+                bossAnim?.UpdateMovement(0f);
                 break;
         }
     }
 
     public void RequestAttack()
     {
-        if (attackTimer > 0) return;
-        if (currentState == BossState.Attack) return;
+        if (attackTimer > 0 || currentState == BossManager.BossState.Attack)
+            return;
 
-        currentState = BossState.Attack;
+        // --- ❗️❗️❗️ เพิ่มโค้ด (Snap Rotation) ❗️❗️❗️ ---
+        if (playerTarget != null)
+        {
+            Vector3 targetDirection = playerTarget.position - transform.position;
+            targetDirection.y = 0;
+            if (targetDirection.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection.normalized);
+                transform.rotation = targetRotation; // ❗️ สั่งหมุนทันที
+            }
+        }
+        // --- --------------------------------- ---
 
-        // 🔹 เริ่มโจมตี → ตั้งสถานะว่ากำลังเล่น Animation
-        isPlayingAnimation = true;
-
+        currentState = BossManager.BossState.Attack;
         DecideAndExecuteAttack();
     }
-    
 
+    // ✅ โค้ดสำหรับสุ่มคอมโบ
     private void DecideAndExecuteAttack()
     {
-        continueComboTimer = 0f; 
-        int nextAttackIndex = 0;
+        continueComboTimer = 0f;
+        int nextAttackIndex;
 
         if (currentComboIndex == 0)
         {
-            if (currentPhase == BossPhase.Phase1)
-            {
-                nextAttackIndex = 1;
-                maxComboCount = 3;
-            }
-            else
-            {
-                int randomChance = Random.Range(1, 101);
-                if (randomChance > 60)
-                {
-                    nextAttackIndex = 4;
-                    maxComboCount = 1;
-                }
-                else
-                {
-                    nextAttackIndex = 1;
-                    maxComboCount = 3;
-                }
-            }
-            currentComboIndex = nextAttackIndex;
+            maxComboCount = 3; // ตีสูงสุด 3 ครั้ง
+            nextAttackIndex = Random.Range(1, 4); // สุ่มท่า 1, 2, หรือ 3
+            currentComboIndex = 1; // นับว่าตีไป 1 ครั้ง
         }
         else
         {
-            currentComboIndex++;
-            if (currentComboIndex > maxComboCount)
-                currentComboIndex = 1;
-
-            nextAttackIndex = currentComboIndex;
+            nextAttackIndex = Random.Range(1, 4);
+            while (nextAttackIndex == lastAttackIndex) // กันท่าซ้ำ
+            {
+                nextAttackIndex = Random.Range(1, 4);
+            }
+            currentComboIndex++; // นับเพิ่ม
         }
 
-        if (bossAnim != null)
-            bossAnim.TriggerAttack(nextAttackIndex);
-
-        Debug.Log($"Boss: Trigger 'Attack' {nextAttackIndex} Fired! Phase: {currentPhase}");
-
-        // ตั้งคูลดาวน์ใหม่
+        lastAttackIndex = nextAttackIndex;
+        bossAnim?.TriggerAttack(nextAttackIndex);
         attackTimer = attackCooldown;
         comboTimer = comboResetTime;
     }
 
+    // ✅ โค้ดสำหรับเช็ค Player หนี
     public void CheckForNextCombo()
     {
+        // 1. ตรวจสอบว่าคอมโบจบหรือยัง
         if (currentComboIndex >= maxComboCount || comboTimer <= 0)
         {
             currentComboIndex = 0;
             comboTimer = 0;
-            continueComboTimer = 0f;
-            Debug.Log("Combo: Finished or timed out.");
+            continueComboTimer = 0;
+            if (currentState != BossManager.BossState.Chase)
+            {
+                currentState = BossManager.BossState.Chase;
+                bossAnim.animator.SetTrigger("ComboExit");
+            }
+            return;
         }
-        else
+
+        // 2. ตรวจสอบว่า Player ยังอยู่ในระยะหรือไม่
+        if (playerTarget != null)
         {
-            continueComboTimer = comboBufferTime;
-            Debug.Log($"Combo Check: Starting {comboBufferTime}s buffer for next hit (Hit {currentComboIndex + 1})");
+            float dist = Vector3.Distance(transform.position, playerTarget.position);
+            
+            if (dist > stoppingDistance + 1.0f) 
+            {
+                Debug.Log("Boss: Player หนีไปไกล! บังคับจบคอมโบ");
+                currentComboIndex = 0;
+                comboTimer = 0;
+                continueComboTimer = 0;
+
+                // ❗️ บังคับจบ ❗️
+                bossAnim.animator.SetTrigger("ComboExit");
+                currentState = BossManager.BossState.Chase; 
+                isPlayingAnimation = false; 
+                
+                return;
+            }
         }
+
+        // 3. ถ้าทุกอย่าง OK ให้เตรียมต่อคอมโบ
+        continueComboTimer = comboBufferTime;
     }
 
     public void ResetComboTimers()
     {
         comboTimer = 0f;
         continueComboTimer = 0f;
-    }
-
-    // 🔹 ฟังก์ชันที่จะถูกเรียกจาก Animation Event
-    public void AnimationAttackStart()
-    {
-        isPlayingAnimation = true;
-        Debug.Log("Boss animation start → Lock movement/strafe");
-    }
-
-    public void AnimationAttackEnd()
-    {
-        isPlayingAnimation = false;
-        currentState = BossState.Chase; // กลับไปไล่ล่าตามปกติ
-        Debug.Log("Boss animation end → Unlock movement/strafe");
     }
 }

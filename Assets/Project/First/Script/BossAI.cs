@@ -31,37 +31,40 @@ public class BossAI : MonoBehaviour
         }
     }
 
-    private void ThinkBehavior()
+private void ThinkBehavior()
     {
         if (manager.playerTarget == null) return;
 
         float distance = Vector3.Distance(manager.transform.position, manager.playerTarget.position);
 
-        // ถ้าผู้เล่นอยู่นอกระยะ bait → เดินเข้าหา
+        // 1. 🟢 ถ้าผู้เล่นอยู่ไกล -> ไล่ (Chase)
+        // ✅ แก้ไข: เพิ่ม BossManager. ข้างหน้า BossState
         if (distance > manager.baitingDistance)
         {
-            if (manager.currentState != BossManager.BossState.Chase)
+            if (manager.currentState != BossManager.BossState.Chase) 
             {
                 manager.currentState = BossManager.BossState.Chase;
-                Debug.Log("BossAI: switching to Chase (player too far)");
+                Debug.Log("BossAI: Player อยู่ไกล -> CHASE");
             }
         }
-        // ถ้าอยู่ในระยะ bait แต่ยังไม่ถึงระยะตี → ให้เดินวน (BossMovement จะจัดการ)
+        // 2. 🟡 ถ้าผู้เล่นอยู่ระยะกลาง -> คุมเชิง (Bait)
+        // ✅ แก้ไข: เพิ่ม BossManager. ข้างหน้า BossState
         else if (distance > manager.stoppingDistance && distance <= manager.baitingDistance)
         {
-            if (manager.currentState != BossManager.BossState.Chase)
+            if (manager.currentState != BossManager.BossState.Bait && manager.currentState != BossManager.BossState.Attack)
             {
-                manager.currentState = BossManager.BossState.Chase;
-                Debug.Log("BossAI: staying in Chase for bait/strafe behavior");
+                manager.currentState = BossManager.BossState.Bait;
+                Debug.Log("BossAI: Player อยู่ระยะกลาง -> BAIT");
             }
         }
-        // ถ้าอยู่ในระยะตี → ให้บอสตีทันที
+        // 3. 🔴 ถ้าผู้เล่นอยู่ใกล้ -> ตี (Attack)
+        // ✅ แก้ไข: เพิ่ม BossManager. ข้างหน้า BossState
         else if (distance <= manager.stoppingDistance)
         {
             if (manager.currentState != BossManager.BossState.Attack)
             {
                 manager.RequestAttack();
-                Debug.Log("BossAI: Requesting attack (in range)");
+                Debug.Log("BossAI: Player อยู่ใกล้ -> ATTACK");
             }
         }
     }

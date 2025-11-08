@@ -155,8 +155,8 @@ public class PlayerMovement : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * delta);
     }
-    // 🔹 อ่านปุ่มเคลื่อนไหวของผู้เล่น (ใช้ใน BossMovement)
-private void LateUpdate()
+    // ✅ เพิ่มฟังก์ชันนี้เข้าไปแทน
+private void Update()
 {
     float horizontal = 0f;
     float vertical = 0f;
@@ -173,6 +173,5 @@ private void LateUpdate()
 
     MoveInput = new Vector2(horizontal, vertical);
 }
-
 
 }

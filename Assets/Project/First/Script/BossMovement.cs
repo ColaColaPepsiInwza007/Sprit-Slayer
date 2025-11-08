@@ -6,16 +6,20 @@ public class BossMovement : MonoBehaviour
     private Vector3 bossVelocity;
     private float gravityValue = -9.81f;
 
-    // 🔹 ตัวแปรใหม่สำหรับพฤติกรรม Bait / Strafe
     private float strafeTimer = 0f;
-    private float maxStrafeTime = 15f;
-    private bool isStrafing = false;
-    private float lastPlayerXPos = 0f;
+    private float maxStrafeTime = 15f; 
+    private float lastStrafeDir = 0f;
+    private PlayerMovement playerController;
 
-    private PlayerMovement playerController; // ✅ reference ไปยัง Player
-    private float lastPlayerLocalX = 0f;     // สำหรับตรวจทิศเคลื่อนของ player
-    private float lastStrafeDir = 0f;        // สำหรับกันการสลับทิศรัว
-    private float recoveryTimer = 0f;
+    [Header("Bait Decision")]
+    private float baitDecisionTimer = 0f;
+    private float baitDecisionInterval = 3.0f; // (ตัวแปรเก่า)
+    private bool isBaitStrafing = false;
+    
+    // --- ❗️❗️❗️ เพิ่ม 2 บรรทัดนี้ (สำหรับแก้ปัญหาที่ 2) ❗️❗️❗️ ---
+    private float baitPatienceTimer = 0f; // ตัวนับเวลา "ความอดทน"
+    private float baitMaxPatienceTime = 5.0f; // ❗️ 5 วินาทีในโหมด Bait แล้วจะเลิก
+    // --- -------------------------------------------- ---
 
     private void Awake()
     {
@@ -29,34 +33,35 @@ public class BossMovement : MonoBehaviour
     {
         HandleRotation(Time.deltaTime);
 
-        // ❌ ถ้าอยู่ใน Attack, Stunned, หรือ Dead → หยุดขยับทุกอย่าง
         if (manager.currentState == BossManager.BossState.Attack ||
             manager.currentState == BossManager.BossState.Stunned ||
-            manager.currentState == BossManager.BossState.Dead)
+            manager.currentState == BossManager.BossState.Dead ||
+            manager.isPlayingAnimation ||
+            manager.isRecoveringFromAttack)
         {
             bossVelocity = Vector3.zero;
             return;
         }
 
-        // ✅ ให้เดินเฉพาะตอนอยู่ในโหมด Chase
         if (manager.currentState == BossManager.BossState.Chase)
         {
-            HandleSmartMovement(Time.deltaTime);
+            HandleChaseMovement(Time.deltaTime);
+        }
+        else if (manager.currentState == BossManager.BossState.Bait)
+        {
+            HandleBaitMovement(Time.deltaTime); 
+        }
+        else if (manager.currentState == BossManager.BossState.Reposition)
+        {
+            HandleRepositionMovement(Time.deltaTime);
+        }
+        else // ❗️ ถ้าหลุดจาก Bait (เช่นไป Chase, Attack)
+        {
+            baitDecisionTimer = 0f; 
+            baitPatienceTimer = 0f; // ❗️ รีเซ็ตความอดทนด้วย
         }
 
         HandleGravity();
-
-        // ✅ Force play walk animation if idle
-        if (manager.bossAnim != null && manager.bossAnim.animator != null)
-        {
-            float targetMoveAmount = (manager.playerTarget != null) ? 1f : 0f;
-
-            if (targetMoveAmount > 0.1f &&
-                manager.bossAnim.animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
-            {
-                manager.bossAnim.animator.Play("Walk", 0);
-            }
-        }
     }
 
     public void HandleRotation(float delta)
@@ -64,8 +69,12 @@ public class BossMovement : MonoBehaviour
         if (manager.playerTarget == null || manager.currentState == BossManager.BossState.Dead)
             return;
 
-        // ✅ หมุนเฉพาะตอน Chase เท่านั้น
-        if (manager.currentState == BossManager.BossState.Chase)
+        // ให้หมุนตัวตอน Chase, Bait, หรือ Reposition
+        bool canRotate = (manager.currentState == BossManager.BossState.Chase || 
+                          manager.currentState == BossManager.BossState.Bait ||
+                          manager.currentState == BossManager.BossState.Reposition);
+
+        if (canRotate && !manager.isPlayingAnimation && !manager.isRecoveringFromAttack)
         {
             Vector3 targetDirection = manager.playerTarget.position - transform.position;
             targetDirection.y = 0;
@@ -76,7 +85,6 @@ public class BossMovement : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, manager.rotationSpeed * delta);
             }
         }
-        // ❌ ถ้าเป็น Attack / Stunned / Dead → ไม่หมุนเลย
     }
 
     public void HandleGravity()
@@ -90,109 +98,128 @@ public class BossMovement : MonoBehaviour
         manager.controller.Move(bossVelocity * Time.deltaTime);
     }
 
-
-private void HandleSmartMovement(float delta)
-{
-    if (manager.playerTarget == null)
-        return;
-
-    // ❌ ถ้าอยู่ในสถานะพิเศษ → ไม่เคลื่อนไหวเลย
-    if (manager.currentState == BossManager.BossState.Attack ||
-        manager.currentState == BossManager.BossState.Stunned ||
-        manager.currentState == BossManager.BossState.Dead ||
-        manager.isRecoveringFromAttack ||           // ✅ เพิ่ม: กำลังฟื้นตัวหลังคอมโบ
-        manager.isPlayingAnimation)                 // ✅ เพิ่ม: ระหว่าง animation ห้ามเคลื่อนไหว
+    private void HandleChaseMovement(float delta)
     {
-        isStrafing = false;
-        strafeTimer = 0f;
-        return;
-    }
+        if (manager.playerTarget == null)
+            return;
 
-    Vector3 toPlayer = manager.playerTarget.position - transform.position;
-    toPlayer.y = 0;
-    float distance = toPlayer.magnitude;
+        Vector3 toPlayer = manager.playerTarget.position - transform.position;
+        toPlayer.y = 0;
+        float distance = toPlayer.magnitude;
 
-    // 🟩 1. อยู่นอกระยะ bait → เดินเข้าหาผู้เล่น
-    if (distance > manager.baitingDistance)
-    {
-        isStrafing = false;
-        strafeTimer = 0f;
-        MoveForward(delta);
-        return;
-    }
-
-    // 🟨 2. อยู่ในระยะ bait แต่ยังไม่ถึงระยะตี → เดินวน (ถ้ามี input)
-    if (distance <= manager.baitingDistance && distance > manager.stoppingDistance)
-    {
-        HandleSmartStrafe(delta, toPlayer);
-
-        // ✅ ถ้า player ไม่ได้กดซ้าย/ขวา → หยุดวนทันที
-        if (playerController != null && Mathf.Abs(playerController.MoveInput.x) < 0.1f)
+        if (distance > manager.stoppingDistance)
         {
-            isStrafing = false;
-            strafeTimer = 0f;
+            MoveForward(delta);
             return;
         }
-        return;
-    }
 
-    // 🟥 3. ถึงระยะโจมตี → โจมตี
-    if (distance <= manager.stoppingDistance)
-    {
-        isStrafing = false;
-        strafeTimer = 0f;
-        manager.RequestAttack();
-        return;
+        if (distance <= manager.stoppingDistance)
+        {
+            manager.RequestAttack();
+        }
     }
-}
-
 
     private void MoveForward(float delta)
     {
         Vector3 move = transform.forward * manager.movementSpeed * delta;
         manager.controller.Move(move);
     }
-
-private void HandleSmartStrafe(float delta, Vector3 toPlayer)
-{
-    // ถ้ากำลังเล่น animation (เช่น โจมตี) → ไม่ขยับเลย
-    if (manager.isPlayingAnimation)
-        return;
-
-    if (playerController == null)
-        return;
-
-    // อ่าน input จาก player (-1 = ซ้าย, +1 = ขวา)
-    float playerMoveX = playerController.MoveInput.x;
-    float strafeDir = lastStrafeDir;
-
-    // ถ้าผู้เล่นกดซ้าย/ขวา → ให้บอสเดินวน "ตรงข้าม"
-    if (Mathf.Abs(playerMoveX) > 0.1f)
+    
+    // ❗️ ฟังก์ชันสำหรับถอยคุมเชิง
+    private void HandleRepositionMovement(float delta)
     {
-        isStrafing = true;
-        strafeTimer += delta;
+        Vector3 backwardMove = -transform.forward * (manager.movementSpeed * 0.5f) * delta;
+        if (lastStrafeDir == 0) lastStrafeDir = 1; 
+        Vector3 sideMove = transform.right * lastStrafeDir * (manager.strafeSpeed * 0.5f) * delta;
+        manager.controller.Move(backwardMove + sideMove);
+    }
 
-        if (strafeTimer >= maxStrafeTime)
+    // --- ❗️❗️❗️ แก้ไขฟังก์ชันนี้ทั้งหมด (แก้ทั้ง 2 ปัญหา) ❗️❗️❗️ ---
+    private void HandleBaitMovement(float delta)
+    {
+        // --- 1. Logic "ความอดทน" (แก้ปัญหาที่ 2) ---
+        baitPatienceTimer += delta;
+        if (baitPatienceTimer > baitMaxPatienceTime)
         {
-            isStrafing = false;
-            strafeTimer = 0f;
-            MoveForward(delta);
-            return;
+            Debug.Log("Boss: หมดความอดทน! กลับไป Chase!");
+            manager.currentState = BossManager.BossState.Chase; // ❗️ บังคับกลับไป Chase
+            baitPatienceTimer = 0f; // รีเซ็ต
+            baitDecisionTimer = 0f; // รีเซ็ต
+            return; // ออกจาก Bait state ทันที
         }
 
-        strafeDir = Mathf.Sign(playerMoveX); // เดินตามทิศ playerMoveX
+        // --- 2. Logic "การตัดสินใจ" (Strafe vs. Still) ---
+        baitDecisionTimer -= delta;
+        if (baitDecisionTimer <= 0)
+        {
+            Debug.Log("Boss: กำลังตัดสินใจ... (Bait)");
+            int randomChoice = Random.Range(0, 100);
+            
+            if (randomChoice > 50) 
+            {
+                isBaitStrafing = true;
+                Debug.Log("Boss: ตัดสินใจ 'เดินวน'");
+            }
+            else
+            {
+                isBaitStrafing = false;
+                Debug.Log("Boss: ตัดสินใจ 'ยืนนิ่ง'");
+            }
+            baitDecisionTimer = Random.Range(2.0f, 4.0f);
+        }
+
+        // --- 3. Logic "การกระทำ" (แก้ปัญหาที่ 1 "เดินลอย") ---
+        if (isBaitStrafing)
+        {
+            // "ฉันจะเดินวน"
+            bool isMoving = HandleSmartStrafe(delta); 
+            
+            // ❗️❗️❗️ นี่คือการแก้บั๊ก "ลอย" ❗️❗️❗️
+            // ถ้า isMoving เป็น true (กำลังเดินวน) -> เล่น Animation
+            // ถ้า isMoving เป็น false (หยุดรอ Player) -> หยุด Animation
+            manager.bossAnim?.UpdateMovement(isMoving ? 1f : 0f);
+        }
+        else
+        {
+            // "ฉันจะยืนนิ่ง"
+            // ❗️❗️❗️ นี่คือการแก้บั๊ก "ลอย" ❗️❗️❗️
+            // ถ้าตัดสินใจจะยืนนิ่ง ก็ต้องสั่ง Animator ให้ Idle
+            manager.bossAnim?.UpdateMovement(0f);
+        }
+    }
+
+    // ❗️ ฟังก์ชันเดินวน (ต้องมี) ❗️
+    private bool HandleSmartStrafe(float delta) 
+    {
+        if (playerController == null)
+            return false; 
+
+        float playerMoveX = playerController.MoveInput.x;
+
+        // 1. ถ้า Player หยุดเดิน บอสก็หยุดเดินวน
+        if (Mathf.Abs(playerMoveX) < 0.1f)
+        {
+            strafeTimer = 0f;
+            return false; // ❗️ คืนค่าว่า "ไม่ขยับ"
+        }
+
+        strafeTimer += delta;
+
+        // 2. ถ้าวนนานไป ให้กลับไป Chase (เป็นการป้องกันอีกชั้น)
+        if (strafeTimer >= maxStrafeTime)
+        {
+            strafeTimer = 0f;
+            manager.currentState = BossManager.BossState.Chase;
+            return false; // ❗️ คืนค่าว่า "ไม่ขยับ"
+        }
+
+        // 3. คำนวณทิศทาง (ใช้ + ตามที่คุณยืนยัน)
+        float strafeDir = +Mathf.Sign(playerMoveX); 
         lastStrafeDir = strafeDir;
 
-        // เดินวนเฉพาะแนวข้าง
         Vector3 strafeMove = transform.right * strafeDir * manager.strafeSpeed * delta;
         manager.controller.Move(strafeMove);
+        
+        return true; // ❗️ คืนค่าว่า "กำลังขยับ"
     }
-    else
-    {
-        // ✅ ถ้า player ไม่ได้กด → หยุดเดินวนทันที
-        isStrafing = false;
-        strafeTimer = 0f;
-    }
-}
-
 }
