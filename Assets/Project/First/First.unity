@@ -14160,7 +14160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimator
   animator: {fileID: 7598764093015442163}
-  animationSpeedMultiplier: 1
+  animationSpeedMultiplier: 1.2
 --- !u!114 &7598764093015442168
 MonoBehaviour:
   m_ObjectHideFlags: 0
