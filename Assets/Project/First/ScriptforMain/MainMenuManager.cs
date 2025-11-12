@@ -12,7 +12,7 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("Starting Game...");
         
         // ❗️ เปลี่ยน "YourGameSceneName" เป็นชื่อ Scene เกมของคุณ
-        SceneManager.LoadScene("First1"); 
+        SceneManager.LoadScene("First"); 
     }
 
     // --- ฟังก์ชันสำหรับปุ่ม Settings ---

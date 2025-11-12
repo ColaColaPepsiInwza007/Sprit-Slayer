@@ -18,8 +18,8 @@ EditorBuildSettings:
     path: Assets/Project/First/Main.unity
     guid: f0d240edf22992241941bba62ffbb322
   - enabled: 1
-    path: Assets/Project/First/First1.unity
-    guid: c95aae96e06041f4385eb3c3bc890f9b
+    path: Assets/Project/First/First.unity
+    guid: 8698543ea92ef544da8e9431928416e5
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: b02eb8a766043bc42b265fd9b2e3669b, type: 3}
   m_UseUCBPForAssetBundles: 0

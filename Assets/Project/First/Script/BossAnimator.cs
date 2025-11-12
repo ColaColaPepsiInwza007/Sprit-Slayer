@@ -45,11 +45,22 @@ public class BossAnimator : MonoBehaviour
         animator.ResetTrigger("ComboExit"); 
         Debug.Log("Animator: Triggers Reset.");
     }
-    
+
     public void SetAnimationSpeed(float multiplier)
     {
         if (animator == null) return;
         animator.speed = multiplier;
-        animationSpeedMultiplier = multiplier; 
+        animationSpeedMultiplier = multiplier;
+    }
+    public void TriggerDie()
+    {
+        if (animator == null) return;
+        
+        // ต้องแน่ใจว่าคุณมี Parameter Type: Trigger ชื่อ "Die" ใน Boss Animator Controller แล้ว
+        animator.SetTrigger("Die"); 
+        
+        // อาจจะหยุดการเคลื่อนไหวแอนิเมชั่นเมื่อตายด้วย
+        animator.SetFloat("MoveY", 0f);
+        animator.SetBool("IsDead", true); // หากคุณใช้ IsDead (Bool) แทน Trigger
     }
 }

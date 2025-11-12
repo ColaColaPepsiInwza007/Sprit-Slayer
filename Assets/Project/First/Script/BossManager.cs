@@ -23,6 +23,11 @@ public class BossManager : MonoBehaviour
     [Header("Boss Health")]
     public float maxHealth = 1000f;
     public float currentHealth;
+    
+
+    // ❗️❗️ เพิ่มตัวแปรอ้างอิง UI ❗️❗️
+    [Header("UI References")]
+    public HPBarUI bossHPBarUI; // อ้างอิงถึง Script ที่ควบคุมแถบเลือด (HPBarUI.cs)
 
     [Header("Phase Thresholds")]
     [SerializeField] private float phase2HealthThreshold = 500f;
@@ -33,8 +38,8 @@ public class BossManager : MonoBehaviour
     public float movementSpeed = 4.0f;
     public float rotationSpeed = 10.0f;
     public float stoppingDistance = 1.5f;
-    public float baitingDistance = 6.0f; // ✅ ตัวแปร Bait
-    public float strafeSpeed = 4.5f;     // ✅ ตัวแปร Bait
+    public float baitingDistance = 6.0f;
+    public float strafeSpeed = 4.5f;
 
     [Header("Attack Settings")]
     public float attackCooldown = 1.0f;
@@ -47,7 +52,7 @@ public class BossManager : MonoBehaviour
     private float comboTimer;
     [SerializeField] private float comboBufferTime = 0.15f;
     private float continueComboTimer = 0f;
-    [HideInInspector] public int lastAttackIndex = 0; // ✅ สำหรับสุ่มคอมโบ
+    [HideInInspector] public int lastAttackIndex = 0;
 
     [Header("Recovery Settings")]
     public float postAttackRecoveryTime = 0.8f;
@@ -55,8 +60,8 @@ public class BossManager : MonoBehaviour
     [HideInInspector] public bool isPlayingAnimation = false;
     [HideInInspector] public bool isRecoveringFromAttack = false;
 
-    [Header("Reposition Settings")] // ✅ เพิ่ม
-    public float repositionTime = 1.5f; // จะถอยนานแค่ไหน
+    [Header("Reposition Settings")]
+    public float repositionTime = 1.5f;
     [HideInInspector] public float repositionTimer = 0f;
 
 
@@ -71,6 +76,9 @@ public class BossManager : MonoBehaviour
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
             playerTarget = playerObj.transform;
+            
+        // ❗️❗️ กำหนดเลือดเริ่มต้นและอัปเดตแถบเลือด UI ครั้งแรก ❗️❗️
+        UpdateHealthBar(); 
     }
 
     private void Update()
@@ -104,7 +112,7 @@ public class BossManager : MonoBehaviour
         if (attackTimer > 0)
             attackTimer -= Time.deltaTime;
 
-        // ✅ Recovery phase check (ที่อัปเดตแล้ว)
+        // Recovery phase check (ที่อัปเดตแล้ว)
         if (isRecoveringFromAttack)
         {
             recoveryTimer -= Time.deltaTime;
@@ -112,7 +120,7 @@ public class BossManager : MonoBehaviour
             {
                 isRecoveringFromAttack = false;
 
-                // ❗️❗️❗️ Logic การตัดสินใจใหม่ (สุ่มถอย) ❗️❗️❗️
+                // Logic การตัดสินใจใหม่ (สุ่มถอย)
                 int randomChoice = Random.Range(0, 100);
                 if (randomChoice > 60) // 40% ที่จะถอย
                 {
@@ -128,7 +136,7 @@ public class BossManager : MonoBehaviour
             }
         }
 
-        // ✅ Timer ของ Reposition
+        // Timer ของ Reposition
         if (currentState == BossManager.BossState.Reposition)
         {
             repositionTimer -= Time.deltaTime;
@@ -160,8 +168,8 @@ public class BossManager : MonoBehaviour
                 // (ปล่อยให้ BossMovement สั่งแอนิเมชั่น)
                 break;
             
-            case BossManager.BossState.Reposition: // ✅ เพิ่ม
-                bossAnim?.UpdateMovement(-1f); // ❗️ ใช้แอนิเมชั่นเดินถอยหลัง
+            case BossManager.BossState.Reposition:
+                bossAnim?.UpdateMovement(-1f); // ใช้แอนิเมชั่นเดินถอยหลัง
                 break;
 
             case BossManager.BossState.Attack:
@@ -169,6 +177,10 @@ public class BossManager : MonoBehaviour
                 break;
 
             case BossManager.BossState.Idle:
+                bossAnim?.UpdateMovement(0f);
+                break;
+            
+            case BossManager.BossState.Dead: // ❗️ เพิ่ม
                 bossAnim?.UpdateMovement(0f);
                 break;
         }
@@ -179,7 +191,7 @@ public class BossManager : MonoBehaviour
         if (attackTimer > 0 || currentState == BossManager.BossState.Attack)
             return;
 
-        // --- ❗️❗️❗️ เพิ่มโค้ด (Snap Rotation) ❗️❗️❗️ ---
+        // --- เพิ่มโค้ด (Snap Rotation) ---
         if (playerTarget != null)
         {
             Vector3 targetDirection = playerTarget.position - transform.position;
@@ -187,7 +199,7 @@ public class BossManager : MonoBehaviour
             if (targetDirection.sqrMagnitude > 0.001f)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(targetDirection.normalized);
-                transform.rotation = targetRotation; // ❗️ สั่งหมุนทันที
+                transform.rotation = targetRotation; // สั่งหมุนทันที
             }
         }
         // --- --------------------------------- ---
@@ -196,7 +208,51 @@ public class BossManager : MonoBehaviour
         DecideAndExecuteAttack();
     }
 
-    // ✅ โค้ดสำหรับสุ่มคอมโบ
+    // ❗️❗️ ฟังก์ชันหลักสำหรับรับความเสียหาย ❗️❗️
+    public void TakeDamage(float damageAmount)
+    {
+        if (currentState == BossState.Dead) return;
+
+        currentHealth -= damageAmount;
+
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+        }
+
+        // อัปเดตแถบเลือด UI
+        UpdateHealthBar();
+
+        if (currentHealth <= 0)
+        {
+            currentState = BossState.Dead;
+            Die();
+        }
+        // else { bossAnim?.TriggerHurt(); } // อาจจะเพิ่มแอนิเมชั่นบาดเจ็บ
+        
+        // ตรวจสอบ Phase Health
+        HandlePhaseTransition();
+    }
+
+    // ❗️❗️ ฟังก์ชันอัปเดตแถบเลือด UI ❗️❗️
+    private void UpdateHealthBar()
+    {
+        if (bossHPBarUI != null)
+        {
+            bossHPBarUI.UpdateHealthBar(currentHealth, maxHealth); 
+        }
+    }
+
+    // ❗️❗️ ฟังก์ชันเมื่อบอสตาย ❗️❗️
+    private void Die()
+    {
+        Debug.Log("Boss has been defeated! Current Phase: " + currentPhase.ToString());
+        bossAnim?.TriggerDie();
+        controller.enabled = false;
+        // โค้ดอื่นๆ เมื่อบอสตาย
+    }
+
+    // โค้ดสำหรับสุ่มคอมโบ
     private void DecideAndExecuteAttack()
     {
         continueComboTimer = 0f;
@@ -204,18 +260,18 @@ public class BossManager : MonoBehaviour
 
         if (currentComboIndex == 0)
         {
-            maxComboCount = 3; // ตีสูงสุด 3 ครั้ง
-            nextAttackIndex = Random.Range(1, 4); // สุ่มท่า 1, 2, หรือ 3
-            currentComboIndex = 1; // นับว่าตีไป 1 ครั้ง
+            maxComboCount = 3; 
+            nextAttackIndex = Random.Range(1, 4); 
+            currentComboIndex = 1; 
         }
         else
         {
             nextAttackIndex = Random.Range(1, 4);
-            while (nextAttackIndex == lastAttackIndex) // กันท่าซ้ำ
+            while (nextAttackIndex == lastAttackIndex) 
             {
                 nextAttackIndex = Random.Range(1, 4);
             }
-            currentComboIndex++; // นับเพิ่ม
+            currentComboIndex++;
         }
 
         lastAttackIndex = nextAttackIndex;
@@ -224,7 +280,7 @@ public class BossManager : MonoBehaviour
         comboTimer = comboResetTime;
     }
 
-    // ✅ โค้ดสำหรับเช็ค Player หนี
+    // โค้ดสำหรับเช็ค Player หนี
     public void CheckForNextCombo()
     {
         // 1. ตรวจสอบว่าคอมโบจบหรือยัง
@@ -253,7 +309,7 @@ public class BossManager : MonoBehaviour
                 comboTimer = 0;
                 continueComboTimer = 0;
 
-                // ❗️ บังคับจบ ❗️
+                // บังคับจบ
                 bossAnim.animator.SetTrigger("ComboExit");
                 currentState = BossManager.BossState.Chase; 
                 isPlayingAnimation = false; 
