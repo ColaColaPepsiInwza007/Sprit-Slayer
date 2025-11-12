@@ -1,70 +1,116 @@
 using UnityEngine;
 using UnityEngine.UI; 
 
+// (*** 🚀 ไฟล์อัปเดต! (ย้าย Logic 'Stamina Regen' มาไว้ที่นี่) 🚀 ***)
+
 public class PlayerStats : MonoBehaviour
 {
+    [Header("UI Components")]
+    [SerializeField] private GameObject hpBarObject; 
+    [SerializeField] private GameObject staminaBarObject; 
+
+    private Slider hpBar;
+    private Slider staminaBar;
+
+    [Header("Flags")]
+    public bool isInvincible = false;
+
     [Header("Stats")]
     public float maxHealth = 100f;
     public float currentHealth;
     public float maxStamina = 100f;
     public float currentStamina;
 
-    // <<< NEW >>>
-    [Header("State")]
-    public bool isInvincible = false; // นี่คือสวิตช์ i-frame
+    [Header("Stamina Regen")]
+    [SerializeField] private float staminaRegenRate = 20f;   
+    [SerializeField] private float staminaRegenDelay = 1.5f;
+    private float staminaRegenTimer = 0f;
 
-    [Header("UI References")]
-    public Slider healthBar;
-    public Slider staminaBar;
-
-    void Start()
+    private void Awake()
     {
         currentHealth = maxHealth;
         currentStamina = maxStamina;
-        UpdateHealthBar();
-        UpdateStaminaBar();
-    }
-
-    // --- ฟังก์ชันสำหรับอัปเดต UI ---
-    
-    public void UpdateHealthBar()
-    {
-        if (healthBar != null)
+        
+        if (hpBarObject != null)
         {
-            healthBar.maxValue = maxHealth;
-            healthBar.value = currentHealth;
+            hpBar = hpBarObject.GetComponentInChildren<Slider>();
+            if (hpBar != null)
+            {
+                hpBar.maxValue = maxHealth;
+                hpBar.value = currentHealth;
+            }
+        }
+        if (staminaBarObject != null)
+        {
+            staminaBar = staminaBarObject.GetComponentInChildren<Slider>();
+            if (staminaBar != null)
+            {
+                staminaBar.maxValue = maxStamina;
+                staminaBar.value = currentStamina;
+            }
         }
     }
 
-    public void UpdateStaminaBar()
+    public void HandleStaminaRegen(float delta)
     {
-        if (staminaBar != null)
+        staminaRegenTimer += delta; 
+            
+        if (staminaRegenTimer >= staminaRegenDelay && currentStamina < maxStamina)
         {
-            staminaBar.maxValue = maxStamina;
-            staminaBar.value = currentStamina;
+            // (*** ❗️ บรรทัดนี้จะ "หาย" แดง... ❗️ ***)
+            RegenerateStamina(staminaRegenRate * delta); 
         }
     }
 
-    // <<< NEW >>>
-    // --- ฟังก์ชันรับดาเมจ (เปิดใช้งาน) ---
-    public void TakeDamage(float amount)
+    public void TakeDamage(float damage)
     {
-        // นี่คือหัวใจของ i-frame!!!
         if (isInvincible)
         {
-            Debug.Log("DODGED! (i-frame active)");
-            return; // ถ้าอมตะอยู่ ให้เมินดาเมจนี้ไปเลย
+            Debug.Log("PLAYER: I-Frame Dodge!");
+            return;
         }
 
-        Debug.Log("Player took " + amount + " damage!");
-        currentHealth -= amount;
-        currentHealth = Mathf.Max(currentHealth, 0); // ไม่ให้เลือดต่ำกว่า 0
-        UpdateHealthBar();
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); 
+        Debug.Log("PLAYER: โดนตี! เหลือเลือด " + currentHealth);
 
-        if (currentHealth <= 0)
+        if (hpBar != null)
         {
-            // (ใส่โลจิกตอนตายตรงนี้)
-            Debug.Log("Player is DEAD");
+            hpBar.value = currentHealth; 
         }
+        
+        if (currentHealth <= 0) { /* Die */ }
+    }
+
+    public void UseStamina(float cost)
+    {
+        currentStamina -= cost;
+        currentStamina = Mathf.Clamp(currentStamina, 0, maxStamina); 
+        
+        if (staminaBar != null)
+        {
+            staminaBar.value = currentStamina; 
+        }
+        
+        staminaRegenTimer = 0f;
+    }
+
+    // (*** ❗️❗️❗️ ...เพราะ "ฟังก์ชันนี้" มันอยู่ที่นี่ครับ! ❗️❗️❗️ ***)
+    public void RegenerateStamina(float amount)
+    {
+        currentStamina += amount;
+        currentStamina = Mathf.Min(currentStamina, maxStamina); 
+        
+        if (staminaBar != null)
+        {
+            staminaBar.value = currentStamina; 
+        }
+    }
+    // (*** ❗️❗️❗️ -------------------------------- ❗️❗️❗️ ***)
+
+
+    public bool HasEnoughStamina(float cost)
+    {
+        return (currentStamina >= cost);
     }
 }

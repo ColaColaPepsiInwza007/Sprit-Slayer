@@ -11,61 +11,48 @@ public class PlayerAnimator : MonoBehaviour
 
     public void UpdateMovementParameters(Vector2 moveInput, bool isSprinting, Transform lockedTarget, bool isLockOnSprinting)
     {
-        if (lockedTarget != null && !isLockOnSprinting)
+        float moveY, moveX;
+        
+        if (lockedTarget == null || isLockOnSprinting)
         {
-            manager.animator.SetFloat("MoveY", moveInput.y, 0.1f, Time.deltaTime);
-            manager.animator.SetFloat("MoveX", moveInput.x, 0.1f, Time.deltaTime);
-        }
-        else
-        {
+            manager.animator.SetBool("IsLockedOn", false);
+            
             float moveAmount = moveInput.magnitude;
             float targetAnimValue;
-            if (isSprinting && moveAmount > 0.1f)
-            {
-                targetAnimValue = 2f; 
-            }
-            else
-            {
-                targetAnimValue = moveAmount; 
-            }
-            manager.animator.SetFloat("MoveY", targetAnimValue, 0.1f, Time.deltaTime); 
-            manager.animator.SetFloat("MoveX", 0, 0.1f, Time.deltaTime); 
+            
+            if (isSprinting && moveAmount > 0.1f) { targetAnimValue = 2f; }
+            else { targetAnimValue = moveAmount; }
+            
+            moveY = targetAnimValue;
+            moveX = 0;
         }
+        else 
+        {
+            manager.animator.SetBool("IsLockedOn", true);
+            moveY = moveInput.y;
+            moveX = moveInput.x;
+        }
+        
+        manager.animator.SetFloat("MoveY", moveY, 0.1f, Time.deltaTime);
+        manager.animator.SetFloat("MoveX", moveX, 0.1f, Time.deltaTime);
     }
 
-    public void SetLockedOn(bool isLocked)
+    public void SetRollDirection(Vector2 direction)
     {
-        manager.animator.SetBool("IsLockedOn", isLocked);
-    }
-
-    public void SetSprinting(bool isSprinting)
-    {
-        manager.animator.SetBool("IsSprinting", isSprinting);
-    }
-
-    public void TriggerRoll()
-    {
-        manager.animator.SetTrigger("Roll");
+        manager.animator.SetFloat("MoveY", direction.y, 0f, Time.deltaTime);
+        manager.animator.SetFloat("MoveX", direction.x, 0f, Time.deltaTime);
     }
     
-    public void TriggerJump()
-    {
-        manager.animator.SetTrigger("Jump");
-    }
+    // (*** (โค้ดที่เหลือเหมือนเดิม) ***)
+    public void SetSprinting(bool isSprinting) { manager.animator.SetBool("IsSprinting", isSprinting); }
+    public void TriggerRoll() { manager.animator.SetTrigger("Roll"); }
+    public void TriggerJump() { manager.animator.SetTrigger("Jump"); }
     
-    public void SetGrounded(bool isGrounded)
-    {
-        manager.animator.SetBool("IsGrounded", isGrounded);
-    }
-
-    // (*** ฟังก์ชันใหม่ 2 อัน (สำหรับ "กันสไลด์") ***)
-    public void StartLanding()
-    {
-        manager.isLanding = true;
-    }
-
-    public void FinishLanding()
-    {
-        manager.isLanding = false;
-    }
+    // (*** ❗️❗️❗️ แก้บั๊กบรรทัดข้างล่างนี้ (ลบ 60, 61) ❗️❗️❗️ ***)
+    public void SetGrounded(bool isGrounded) { manager.animator.SetBool("IsGrounded", isGrounded); }
+    
+    public void StartLanding() { manager.isLanding = true; }
+    public void FinishLanding() { manager.isLanding = false; }
+    public void SetArmed(bool isArmed) { manager.animator.SetBool("IsArmed", isArmed); }
+    public void TriggerAttack(int combo) { } 
 }
