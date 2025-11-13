@@ -1,22 +1,37 @@
 using UnityEngine;
-using UnityEngine.UI; // ต้องเรียกใช้ Library นี้
-// ต้องนำเข้า System.Collections.Generic ด้วย ถ้าต้องการใช้ List
-// using System.Collections.Generic; 
+using UnityEngine.UI; // ต้องใช้ Library UI
 
 public class HPBarUI : MonoBehaviour
 {
-    // อ้างอิงถึง Image Component ของแถบเลือด (HP_Fill)
-    public Image fillImage;
+    // ❗️❗️ เปลี่ยนจาก Image เป็น Slider ❗️❗️
+    [Header("Health Bar References")]
+    public Slider healthSlider; 
+    
+    // Optional: Text Component
+    public Text healthText; 
 
-    // ฟังก์ชันสำหรับอัปเดตแถบเลือด (เรียกใช้ทุกครั้งที่เลือดบอสเปลี่ยน)
-    // currentHP คือ เลือดปัจจุบันของบอส
-    // maxHP คือ เลือดสูงสุดของบอส
+    // ฟังก์ชันนี้ถูกเรียกโดย BossManager.cs
     public void UpdateHealthBar(float currentHP, float maxHP)
     {
-        // คำนวณเปอร์เซ็นต์ของเลือด (ค่าระหว่าง 0.0 ถึง 1.0)
+        // 1. คำนวณเปอร์เซ็นต์ของเลือด
         float fillAmount = currentHP / maxHP;
 
-        // กำหนดค่า Fill Amount ให้กับ Image Component
-        fillImage.fillAmount = fillAmount;
+        // 2. ป้องกัน NullReferenceException และกำหนดค่า Slider
+        if (healthSlider != null)
+        {
+            // กำหนดค่า Value ให้กับ Slider (ค่าจะอยู่ระหว่าง 0 ถึง 1)
+            // หมายเหตุ: ต้องตั้งค่า Min Value ของ Slider ใน Inspector เป็น 0 และ Max Value เป็น 1
+            healthSlider.value = fillAmount;
+        } 
+        else 
+        {
+            Debug.LogError("HPBarUI: healthSlider is NOT assigned! Cannot update health bar.");
+        }
+        
+        // 3. อัปเดตตัวเลข HP (ถ้ามี)
+        if (healthText != null)
+        {
+            healthText.text = currentHP.ToString("F0") + " / " + maxHP.ToString("F0"); 
+        }
     }
 }
