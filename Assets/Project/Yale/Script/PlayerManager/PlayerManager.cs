@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// (*** 🚀 PlayerManager (อัปเดต 9: "Refactor" ย้าย Input Buffering ออก) 🚀 ***)
+// (*** 🚀 PlayerManager (v11: Based on v9 + Audio Fix) 🚀 ***)
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
@@ -9,6 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerAnimator))]
 [RequireComponent(typeof(PlayerLockOn))]
+[RequireComponent(typeof(PlayerAudioController))] // ❗️ NEW: (1/3) เพิ่ม RequireComponent
 public class PlayerManager : MonoBehaviour
 {
     private PlayerBaseState currentState;
@@ -22,9 +23,10 @@ public class PlayerManager : MonoBehaviour
     public Animator animator;
     public PlayerStats stats; 
     public PlayerInputHandler inputHandler; 
-    public PlayerMovement movement; // (*** ❗️ ชื่อนี้ ❗️ ***)
+    public PlayerMovement movement; 
     public PlayerAnimator animHandler;
     public PlayerLockOn lockOn;
+    [HideInInspector] public PlayerAudioController audioController; // ❗️ NEW: (2/3) เพิ่มตัวแปร
     public WeaponHitbox weaponHitbox;
     public Transform cameraMainTransform;
     
@@ -75,11 +77,12 @@ public class PlayerManager : MonoBehaviour
         stats = GetComponent<PlayerStats>(); 
         inputHandler = GetComponent<PlayerInputHandler>();
         
-        // (*** ❗️❗️❗️ "เช็ค" บรรทัดนี้ให้ดี ❗️❗️❗️ ***)
         movement = GetComponent<PlayerMovement>(); 
         
         animHandler = GetComponent<PlayerAnimator>();
         lockOn = GetComponent<PlayerLockOn>();
+        audioController = GetComponent<PlayerAudioController>(); // ❗️ NEW: (3/3) กำหนดค่า
+        
         weaponHitbox = GetComponentInChildren<WeaponHitbox>(); 
         if (Camera.main != null) { cameraMainTransform = Camera.main.transform; }
         
@@ -105,7 +108,6 @@ public class PlayerManager : MonoBehaviour
         
         if (jumpCooldownTimer > 0) { jumpCooldownTimer -= delta; }
 
-        // (*** (พอไม่แครช... 2 บรรทัดนี้จะกลับมาทำงาน) ***)
         if (inputHandler.drawWeaponInput) { HandleWeaponToggle(); }
         if (inputHandler.toggleMouseInput) { ToggleMouseLock(); }
 
@@ -147,14 +149,15 @@ public class PlayerManager : MonoBehaviour
     
     public void StartIFrames() { stats.isInvincible = true; }
     public void EndIFrames() { stats.isInvincible = false; }
-   public void OpenHitbox() 
-{ 
-    if (weaponHitbox != null) 
-    {
-        weaponHitbox.OpenHitbox(); 
+    
+    public void OpenHitbox() 
+    { 
+        if (weaponHitbox != null) 
+        {
+            weaponHitbox.OpenHitbox(); 
+        }
     }
-}
-// ..
+
     private void HandleGroundCheck()
     {
         Vector3 checkPoint = transform.position + groundCheckOffset;
