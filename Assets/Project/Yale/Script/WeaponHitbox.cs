@@ -38,7 +38,7 @@ public class WeaponHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("Boss")) // ใช้ Boss แทน Enemy เพื่อความชัวร์
+        if (other.CompareTag("Enemy")) // ใช้ Boss แทน Enemy เพื่อความชัวร์
         {
             if (targetsHit.Contains(other))
             {
@@ -64,19 +64,23 @@ public class WeaponHitbox : MonoBehaviour
                 
                 // 3. คำนวณดาเมจ
                 float finalDamage = baseDamage;
+                float finalStanceDamage = 0f;
                 
                 if (manager != null && manager.isAttacking && manager.currentAttackData != null)
                 {
-                    finalDamage *= manager.currentAttackData.damageMultiplier; 
-                    
-                    // ❗️❗️ ส่งค่า Stance Damage ไปให้ Boss (ต้องเพิ่มฟังก์ชัน TakeStanceDamage ใน BossManager.cs) ❗️❗️
-                    // boss.TakeStanceDamage(manager.currentAttackData.poiseDamage); 
+                    finalDamage *= manager.currentAttackData.damageMultiplier;
+                    finalStanceDamage = manager.currentAttackData.poiseDamage;
+                
                 }
                 
                 // 4. เรียกฟังก์ชันลดเลือด
                 boss.TakeDamage(finalDamage); 
-                Debug.Log($"Hit Boss: {boss.name} for {finalDamage} damage. (Stance Damage: {manager.currentAttackData?.poiseDamage})");
+                
+                // ❗️❗️ 5. เรียกฟังก์ชันลด Stance ❗️❗️
+                boss.TakeStanceDamage(finalStanceDamage); 
+
+                Debug.Log($"Hit Boss: {boss.name} for {finalDamage} damage. (Stance Damage: {finalStanceDamage})");
+            }
             }
         }
     }
-}

@@ -52,6 +52,11 @@ public class BossAnimator : MonoBehaviour
         animator.speed = multiplier;
         animationSpeedMultiplier = multiplier;
     }
+    public void TriggerStun()
+    {
+        // "Stun" คือชื่อ Trigger Parameter ที่คุณต้องสร้างในหน้าต่าง Animator Controller
+        animator.SetTrigger("Stun"); 
+    }
     public void TriggerDie()
     {
         if (animator == null) return;
@@ -63,4 +68,5 @@ public class BossAnimator : MonoBehaviour
         animator.SetFloat("MoveY", 0f);
         animator.SetBool("IsDead", true); // หากคุณใช้ IsDead (Bool) แทน Trigger
     }
+    
 }
