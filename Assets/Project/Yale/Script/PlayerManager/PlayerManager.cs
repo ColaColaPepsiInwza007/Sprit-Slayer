@@ -147,8 +147,14 @@ public class PlayerManager : MonoBehaviour
     
     public void StartIFrames() { stats.isInvincible = true; }
     public void EndIFrames() { stats.isInvincible = false; }
-    public void OpenHitbox() { if (weaponHitbox != null) weaponHitbox.OpenHitbox(); }
-    
+   public void OpenHitbox() 
+{ 
+    if (weaponHitbox != null) 
+    {
+        weaponHitbox.OpenHitbox(); 
+    }
+}
+// ..
     private void HandleGroundCheck()
     {
         Vector3 checkPoint = transform.position + groundCheckOffset;

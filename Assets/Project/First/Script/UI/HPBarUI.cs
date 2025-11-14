@@ -3,8 +3,7 @@ using UnityEngine.UI; // ต้องใช้ Library UI
 
 public class HPBarUI : MonoBehaviour
 {
-    // ❗️❗️ เปลี่ยนจาก Image เป็น Slider ❗️❗️
-    [Header("Health Bar References")]
+    [Header("Health Bar References")] //Image
     public Slider healthSlider; 
     
     // Optional: Text Component

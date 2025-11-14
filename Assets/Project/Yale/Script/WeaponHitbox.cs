@@ -6,10 +6,12 @@ public class WeaponHitbox : MonoBehaviour
     public Collider weaponCollider; 
     private List<Collider> targetsHit;
     
-    // ❗️❗️ 1. เพิ่มตัวแปรสำหรับค่าดาเมจ ❗️❗️
     [Header("Damage Settings")]
     public float baseDamage = 50f; 
     private PlayerManager manager;
+
+    // ❗️❗️ เพิ่มตัวแปรเพื่อเก็บค่า Stance Damage ของการโจมตีปัจจุบัน ❗️❗️
+    [HideInInspector] public float currentStanceDamage = 0f;
 
     private void Awake()
     {
@@ -20,7 +22,6 @@ public class WeaponHitbox : MonoBehaviour
         weaponCollider.enabled = false; 
         targetsHit = new List<Collider>();
         
-        // ❗️ 2. ดึง PlayerManager เพื่อคำนวณดาเมจ ❗️
         manager = GetComponentInParent<PlayerManager>(); 
     }
 
@@ -37,8 +38,7 @@ public class WeaponHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 1. ตรวจสอบว่าเป็น "บอส" หรือ "ศัตรู"
-        if (other.CompareTag("Enemy") || other.CompareTag("Enemy")) 
+        if (other.CompareTag("Enemy") || other.CompareTag("Boss")) // ใช้ Boss แทน Enemy เพื่อความชัวร์
         {
             if (targetsHit.Contains(other))
             {
@@ -47,24 +47,35 @@ public class WeaponHitbox : MonoBehaviour
             
             targetsHit.Add(other);
             
-            // 2. ดึง Script BossManager
             BossManager boss = other.GetComponent<BossManager>();
             
             if (boss != null)
             {
+                // 1. กำหนดตำแหน่งการชน
+                // ใช้ตำแหน่งกึ่งกลางของ Collider ของบอสเป็นการประมาณจุดชน
+                Vector3 impactPoint = other.bounds.center; 
+
+                // 2. เรียกฟังก์ชันแสดง Effect ผ่าน BossCombatFX
+                BossCombatFX fx = other.GetComponent<BossCombatFX>();
+                if (fx != null)
+                {
+                    fx.PlayImpactEffect(impactPoint); // 💥 เล่นเอฟเฟกต์!
+                }
+                
                 // 3. คำนวณดาเมจ
                 float finalDamage = baseDamage;
                 
-                // ถ้า Player กำลังตีอยู่ ให้ดึง Damage Multiplier จาก AttackData
                 if (manager != null && manager.isAttacking && manager.currentAttackData != null)
                 {
-                    // ใช้ Damage Multiplier จาก Scriptable Object (AttackData)
                     finalDamage *= manager.currentAttackData.damageMultiplier; 
+                    
+                    // ❗️❗️ ส่งค่า Stance Damage ไปให้ Boss (ต้องเพิ่มฟังก์ชัน TakeStanceDamage ใน BossManager.cs) ❗️❗️
+                    // boss.TakeStanceDamage(manager.currentAttackData.poiseDamage); 
                 }
                 
                 // 4. เรียกฟังก์ชันลดเลือด
                 boss.TakeDamage(finalDamage); 
-                Debug.Log($"Hit Boss: {boss.name} for {finalDamage} damage.");
+                Debug.Log($"Hit Boss: {boss.name} for {finalDamage} damage. (Stance Damage: {manager.currentAttackData?.poiseDamage})");
             }
         }
     }

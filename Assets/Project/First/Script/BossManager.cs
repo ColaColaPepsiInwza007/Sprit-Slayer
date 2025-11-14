@@ -66,11 +66,13 @@ public class BossManager : MonoBehaviour
 
 
     [HideInInspector] public bool allowRootMotion = true;
+    public BossCombatFX combatFX;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         bossAnim = GetComponent<BossAnimator>();
+        combatFX = GetComponent<BossCombatFX>();
         currentHealth = maxHealth;
 
         GameObject playerObj = GameObject.FindWithTag("Player");
