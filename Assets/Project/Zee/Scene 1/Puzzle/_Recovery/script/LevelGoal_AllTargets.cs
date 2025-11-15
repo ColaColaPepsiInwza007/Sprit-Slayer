@@ -1,24 +1,24 @@
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class LevelGoal_AllTargets : MonoBehaviour
 {
-    [Tooltip("????????? = ?? TargetHoldReceiver ???????????????")]
     public TargetHoldReceiver[] targets;
-
-    [Tooltip("?????????????? ?: ???????????????????????????????????????????????")]
     public float confirmSeconds = 0.0f;
-
     public UnityEvent onLevelComplete;
 
-    private float _confirmTimer;
-    private bool _fired;
+    [Header("Load scene อัตโนมัติ (ออปชัน)")]
+    public bool autoLoadNextScene = true;          // true = โหลดฉากถัดไปตาม Build Index
+    public string loadSceneByName = "";            // ถ้าไม่ว่าง จะโหลดตามชื่อนี้แทน
+
+    float _t; bool _fired;
 
     void Start()
     {
         if (targets == null || targets.Length == 0)
-            targets = FindObjectsOfType<TargetHoldReceiver>(includeInactive: false);
+            targets = FindObjectsOfType<TargetHoldReceiver>(false);
     }
 
     void Update()
@@ -28,17 +28,21 @@ public class LevelGoal_AllTargets : MonoBehaviour
         bool allHeld = targets.All(t => t && t.IsHeld);
         if (allHeld)
         {
-            _confirmTimer += Time.deltaTime;
-            if (_confirmTimer >= confirmSeconds)
+            _t += Time.deltaTime;
+            if (_t >= confirmSeconds)
             {
                 _fired = true;
                 onLevelComplete?.Invoke();
-                Debug.Log("[GOAL] Level Complete!");
+
+                if (autoLoadNextScene || !string.IsNullOrEmpty(loadSceneByName))
+                {
+                    if (!string.IsNullOrEmpty(loadSceneByName))
+                        SceneManager.LoadScene(loadSceneByName);
+                    else
+                        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                }
             }
         }
-        else
-        {
-            _confirmTimer = 0f;
-        }
+        else _t = 0f;
     }
 }
