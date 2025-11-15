@@ -16,7 +16,7 @@ MonoBehaviour:
   transitionTime: 0.1
   staminaCost: 10
   damageMultiplier: 1
-  poiseDamage: 10
+  poiseDamage: 5
   nextLightAttack: {fileID: 11400000, guid: 9a5230823cffc45459dd16765449c7a3, type: 2}
   nextHeavyAttack: {fileID: 0}
   rollAttack: {fileID: 0}

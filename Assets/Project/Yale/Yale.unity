@@ -5316,10 +5316,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: looping
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
+      propertyPath: UVModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
+      propertyPath: ShapeModule.enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
@@ -5336,11 +5344,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023278767535983516, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: playOnAwake
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023278767535983516, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
+      propertyPath: autoRandomSeed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3023278767535983516, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
+      propertyPath: startDelay.scalar
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3023278767535983516, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: EmissionModule.rateOverDistance.scalar
-      value: 0
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4932250714779406366, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: m_Name
@@ -5452,11 +5468,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7630475134078635425, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: looping
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7630475134078635425, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: playOnAwake
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7630475134078635425, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
@@ -5470,10 +5486,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 4932250715079977961, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4932250714779406366, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 537756498}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
 --- !u!1001 &146432894
 PrefabInstance:
@@ -16245,11 +16258,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 024a25ebdf4b4db4fbde68fa44ae9e39, type: 3}
---- !u!198 &418956974 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 7630475134078635425, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
-  m_PrefabInstance: {fileID: 140965063}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &424165732 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000014167154672, guid: 9346c6a558dc47e43af22160234e4f98, type: 3}
@@ -20368,21 +20376,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4932250715211415471, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
   m_PrefabInstance: {fileID: 140965063}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &537756498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 537756496}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e682acdb1fb98a46918fa9c5a765c0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponVFXController
-  weaponTrails:
-  - {fileID: 418956974}
-  - {fileID: 1529113569}
 --- !u!4 &539175666 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1031170274, guid: abc00000000000893861180305570013, type: 3}
@@ -27628,7 +27621,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3488039642409251121, guid: fd85977a2bc400241be8265e488f072f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.013
+      value: -0.001
       objectReference: {fileID: 0}
     - target: {fileID: 3488039642409251121, guid: fd85977a2bc400241be8265e488f072f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -55016,7 +55009,7 @@ MonoBehaviour:
   audioController: {fileID: 0}
   weaponHitbox: {fileID: 1052154981}
   cameraMainTransform: {fileID: 0}
-  weaponVFXObject: {fileID: 537756496}
+  swordVFXRoot: {fileID: 537756496}
   lastAttackStartTime: 0
   isLanding: 0
   isAttacking: 0
@@ -62451,11 +62444,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 0f1e1518a80e562458930d8b2d0670d9, type: 3}
   m_PrefabInstance: {fileID: 1393702155}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &1529113569 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 1921745305090796737, guid: 2ada0c85dd305804eb6f79031282fe10, type: 3}
-  m_PrefabInstance: {fileID: 140965063}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1530431563 stripped
 Transform:

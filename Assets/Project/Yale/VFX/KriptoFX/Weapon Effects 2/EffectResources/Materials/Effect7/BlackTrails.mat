@@ -26,7 +26,6 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _BUILTIN_SURFACE_TYPE_TRANSPARENT
-  - _SURFACE_TYPE_TRANSPARENT
   - _VELOCITYMODE_IGNOREVELOCITY
   m_InvalidKeywords:
   - _EMISSION
@@ -35,9 +34,8 @@ Material:
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap:
-    RenderType: Transparent
+    RenderType: Opaque
   disabledShaderPasses:
-  - DepthOnly
   - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
@@ -138,8 +136,8 @@ Material:
     - _DistortionEnabled: 1
     - _DistortionStrength: -5
     - _DistortionStrengthScaled: -0.5
-    - _DstBlend: 10
-    - _DstBlendAlpha: 10
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
     - _EmissionEnabled: 0
     - _FlipbookMode: 0
     - _Float: 0
@@ -165,15 +163,15 @@ Material:
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
     - _SpecularHighlights: 1
-    - _SrcBlend: 5
+    - _SrcBlend: 1
     - _SrcBlendAlpha: 1
-    - _Surface: 1
+    - _Surface: 0
     - _USERCOLORASFRAMEOFFSET: 0
     - _UVSec: 0
     - _VELOCITYMODE: 0
     - _VirtualOffset: 0
     - _ZTest: 4
-    - _ZWrite: 0
+    - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
